@@ -1,0 +1,46 @@
+<div class="min-h-screen bg-gray-50 p-6">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold text-gray-800 mb-4">Gestión de Tareas</h1>
+
+      <!-- Formulario para crear nueva lista -->
+      <div class="bg-white rounded-lg p-6 shadow-md mb-6">
+        <h2 class="text-xl font-semibold text-gray-700 mb-4">Crear Nueva Lista</h2>
+        <div class="flex gap-4 flex-wrap">
+          <input type="text" placeholder="Nombre de la lista" [(ngModel)]="newListName"
+            class="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
+          <select [(ngModel)]="selectedColor"
+            class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+            <option value="">Color por defecto</option>
+            <option value="primary">Azul</option>
+            <option value="secondary">Verde</option>
+            <option value="accent">Naranja</option>
+            <option value="soft-pink">Rosa</option>
+            <option value="soft-lavender">Lavanda</option>
+          </select>
+          <button (click)="createNewList()" [disabled]="!newListName().trim()"
+            class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors">
+            Crear Lista
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Board de listas -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      @for (list of taskService.lists(); track list.id) {
+      <app-list [list]="list" (taskMoved)="onTaskMoved($event)" class="h-fit" />
+      }
+    </div>
+
+    <!-- Mensaje cuando no hay listas -->
+    @if (taskService.lists().length === 0) {
+    <div class="text-center py-12">
+      <div class="text-gray-400 text-6xl mb-4">📋</div>
+      <h3 class="text-xl font-semibold text-gray-600 mb-2">No hay listas creadas</h3>
+      <p class="text-gray-500">Crea tu primera lista para comenzar a organizar tus tareas</p>
+    </div>
+    }
+  </div>
+</div>
