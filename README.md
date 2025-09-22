@@ -170,7 +170,7 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 ## 👤 Autor
 
 **Tu Nombre**
-- GitHub: [@tu-usuario](https://github.com/Juliodvp29)
-- LinkedIn: [@tu-perfil]([https://linkedin.com/in/tu-perfil](https://www.linkedin.com/in/julio-enrique-25481122b/))
+- GitHub: [@Juliodvp29](https://github.com/Juliodvp29)
+- LinkedIn: [@Julio Enrique]([https://linkedin.com/in/tu-perfil](https://www.linkedin.com/in/julio-enrique-25481122b/))
 
 ⭐ ¡Dale una estrella si te gusta el proyecto!
