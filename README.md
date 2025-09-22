@@ -1,59 +1,176 @@
-# DragDropTasks
+# 📋 Drag Drop Tasks
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.2.
+Una aplicación moderna de gestión de tareas con funcionalidad de arrastrar y soltar, construida con Angular 19 y diseñada con Tailwind CSS.
 
-## Development server
+## ✨ Características
 
-To start a local development server, run:
+- 🎯 **Gestión de Tareas**: Crea, edita y elimina tareas fácilmente
+- 🎨 **Drag & Drop**: Mueve tareas entre diferentes listas de forma intuitiva
+- 📊 **Tableros Personalizables**: Crea listas con colores personalizados
+- 🚨 **Sistema de Prioridades**: Organiza tareas por urgencia (Baja, Media, Alta, Urgente)
+- 💾 **Persistencia Local**: Guarda automáticamente en localStorage
+- 📱 **Diseño Responsivo**: Funciona perfectamente en móviles y escritorio
+- 🌙 **Interfaz Moderna**: Diseño limpio y minimalista con Tailwind CSS
+- ⚡ **Zoneless Change Detection**: Mejor rendimiento con Angular Signals
 
+## 🚀 Tecnologías
+
+- **Frontend**: Angular 20
+- **Arquitectura**: Standalone Components, Signals
+- **Estilos**: Tailwind CSS v3.4
+- **Gestión de Estado**: Angular Signals
+- **Persistencia**: localStorage (con servicio personalizado)
+- **Testing**: Jasmine + Karma
+
+## 🛠️ Instalación
+
+1. **Clona el repositorio**
 ```bash
-ng serve
+git clone https://github.com/tu-usuario/drag-drop-tasks.git
+cd drag-drop-tasks
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
+2. **Instala las dependencias**
 ```bash
-ng generate component component-name
+npm install
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
+3. **Ejecuta la aplicación**
 ```bash
-ng generate --help
+npm start
 ```
 
-## Building
+4. **Abre tu navegador**
+Visita `http://localhost:4200`
 
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## 📦 Scripts Disponibles
 
 ```bash
-ng test
+# Desarrollo
+npm start                 # Inicia servidor de desarrollo
+npm run build            # Construye para producción
+npm run build:dev        # Construye para desarrollo
+npm run watch            # Construye en modo watch
+
+# Testing
+npm test                 # Ejecuta tests unitarios
+npm run test:coverage    # Tests con coverage
+npm run e2e              # Tests end-to-end
+
+# Calidad de código
+npm run lint             # Ejecuta ESLint
+npm run lint:fix         # Corrige errores de linting automáticamente
 ```
 
-## Running end-to-end tests
+## 🏗️ Arquitectura del Proyecto
 
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
+```
+src/
+├── app/
+│   ├── core/                    # Servicios principales y configuración
+│   │   ├── interceptors/        # Interceptores HTTP
+│   │   └── services/           # Servicios core (Auth, Storage, Loader)
+│   ├── layout/                 # Componentes de layout
+│   │   ├── main-layout/        # Layout principal
+│   │   └── side-nav/           # Navegación lateral
+│   ├── pages/                  # Páginas principales
+│   │   ├── calendar/           # Página calendario (en desarrollo)
+│   │   ├── home/              # Página inicio
+│   │   └── tasks/             # Página de tareas
+│   │       ├── components/     # Componentes específicos de tareas
+│   │       │   ├── card/       # Tarjeta de tarea individual
+│   │       │   └── list/       # Lista de tareas
+│   │       └── services/       # Servicios de tareas
+│   └── shared/                 # Componentes y utilidades compartidas
+│       ├── components/         # Componentes reutilizables
+│       ├── models/             # Interfaces y modelos
+│       ├── pipes/              # Pipes personalizados
+│       └── utils/              # Utilidades y helpers
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## 🎯 Funcionalidades Principales
 
-## Additional Resources
+### 📋 Gestión de Listas
+- Crear listas personalizadas con colores
+- Eliminar listas completas
+- Visualización de estadísticas por lista
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+### 📝 Gestión de Tareas
+- Crear tareas con diferentes prioridades
+- Marcar tareas como completadas
+- Eliminar tareas individuales
+- Ordenamiento automático por prioridad y fecha
+
+### 🎨 Drag & Drop
+- Mover tareas entre listas arrastrando
+- Feedback visual durante el arrastre
+- Prevención de drops inválidos
+
+### 🎨 Sistema de Colores
+- Selector de colores predefinidos
+- Soporte para colores personalizados (hex)
+- Aplicación visual en bordes de listas
+
+## 🔧 Servicios Principales
+
+### TaskService
+Gestiona todas las operaciones CRUD de tareas y listas:
+- Creación y eliminación de listas
+- Operaciones de tareas (crear, completar, eliminar, mover)
+- Persistencia automática en localStorage
+
+### StorageService
+Abstrae el manejo de localStorage con:
+- Serialización/deserialización automática
+- Manejo de errores
+- Signal reactivo para el token de autenticación
+
+### LoaderService
+Controla el estado de carga global de la aplicación
+
+## 🎨 Componentes Destacados
+
+### Card Component
+- Visualización completa de información de tareas
+- Indicadores visuales de prioridad
+- Acciones rápidas (completar, eliminar)
+- Funcionalidad drag & drop integrada
+
+### List Component
+- Contenedor de tareas con drag & drop
+- Formulario de creación de tareas
+- Estadísticas de prioridades
+- Opciones de gestión de lista
+
+### ColorPicker Component
+- Selector de colores con paleta predefinida
+- Soporte para colores personalizados
+- Integración con Angular Forms (ControlValueAccessor)
+
+## 🚀 Próximas Funcionalidades
+
+- [ ] 📅 Integración completa del calendario
+- [ ] 🔍 Sistema de búsqueda y filtros
+- [ ] 🏷️ Sistema de etiquetas/tags
+- [ ] 🔒 Sistema de autenticación
+- [ ] 🌙 Modo oscuro
+
+## 🤝 Contribuir
+
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+
+## 👤 Autor
+
+**Tu Nombre**
+- GitHub: [@tu-usuario](https://github.com/Juliodvp29)
+- LinkedIn: [@tu-perfil]([https://linkedin.com/in/tu-perfil](https://www.linkedin.com/in/julio-enrique-25481122b/))
+
+⭐ ¡Dale una estrella si te gusta el proyecto!
