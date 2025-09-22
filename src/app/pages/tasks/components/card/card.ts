@@ -53,8 +53,10 @@ export class Card {
 
     event.dataTransfer?.setData('text/plain', JSON.stringify(dragData));
 
-    // Efecto visual para el drag
-    if (event.dataTransfer) {
+    const dragImage = document.getElementById('drag-image');
+
+    if (dragImage && event.dataTransfer) {
+      event.dataTransfer.setDragImage(dragImage, 12, 12);
       event.dataTransfer.effectAllowed = 'move';
     }
   }

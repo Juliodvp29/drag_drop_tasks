@@ -10,15 +10,8 @@
         <div class="flex gap-4 flex-wrap">
           <input type="text" placeholder="Nombre de la lista" [(ngModel)]="newListName"
             class="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
-          <select [(ngModel)]="selectedColor"
-            class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-            <option value="">Color por defecto</option>
-            <option value="primary">Azul</option>
-            <option value="secondary">Verde</option>
-            <option value="accent">Naranja</option>
-            <option value="soft-pink">Rosa</option>
-            <option value="soft-lavender">Lavanda</option>
-          </select>
+          <app-color-picker label="" placeholder="Color del tablero" (colorChange)="onColorChange($event)"
+            [allowEmpty]="true" [allowCustomColor]="false" />
           <button (click)="createNewList()" [disabled]="!newListName().trim()"
             class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors">
             Crear Lista

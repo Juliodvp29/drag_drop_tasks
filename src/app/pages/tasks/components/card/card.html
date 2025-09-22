@@ -1,6 +1,6 @@
 <!-- Template completo del componente Card -->
 <div
-  class="bg-gray-50 rounded-lg p-3 border-l-4 border-gray-200 hover:shadow-md transition-all duration-200 cursor-grab active:cursor-grabbing group"
+  class="bg-gray-50 mb-3 rounded-lg p-3 border-l-4 border-gray-200 hover:shadow-md transition-all duration-200 cursor-grab active:cursor-grabbing group"
   [class.opacity-75]="isDragging()" [ngClass]="getPriorityBorderClass()" draggable="true"
   (dragstart)="onDragStart($event)" (dragend)="onDragEnd($event)">
   <!-- Header con prioridad -->
@@ -79,4 +79,16 @@
   @if (task.finishedAt) {
   <div class="absolute inset-0 bg-success bg-opacity-5 rounded-lg pointer-events-none"></div>
   }
+</div>
+
+<div id="drag-image" class="hidden-drag-image">
+  <svg class="w-6 h-6 text-gray-800 dark:text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+    height="24" fill="currentColor" viewBox="0 0 24 24">
+    <path
+      d="M5 3a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5Zm0 12a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2H5Zm12 0a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-2Zm0-12a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2Z" />
+    <path fill-rule="evenodd"
+      d="M10 6.5a1 1 0 0 1 1-1h2a1 1 0 1 1 0 2h-2a1 1 0 0 1-1-1ZM10 18a1 1 0 0 1 1-1h2a1 1 0 1 1 0 2h-2a1 1 0 0 1-1-1Zm-4-4a1 1 0 0 1-1-1v-2a1 1 0 1 1 2 0v2a1 1 0 0 1-1 1Zm12 0a1 1 0 0 1-1-1v-2a1 1 0 1 1 2 0v2a1 1 0 0 1-1 1Z"
+      clip-rule="evenodd" />
+  </svg>
+
 </div>

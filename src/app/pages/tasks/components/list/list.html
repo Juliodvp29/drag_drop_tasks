@@ -1,4 +1,4 @@
-<div class="bg-white rounded-xl shadow-lg overflow-hidden border-t-4" [ngClass]="getListBorderClass()"
+<div class="bg-white rounded-xl shadow-lg overflow-hidden border-t-4" [style.borderColor]="list.color"
   (dragover)="onDragOver($event)" (drop)="onDrop($event)">
   <!-- Header de la lista -->
   <div class="p-4 border-b border-gray-100">
@@ -50,15 +50,15 @@
         (keyup.enter)="createTask()"
         class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
       <div class="flex gap-2">
-        <select [(ngModel)]="selectedTaskPriority"
-          class="flex-1 px-3 py-1 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-          <option value="low">🟢 Baja prioridad</option>
-          <option value="medium">🟡 Media prioridad</option>
-          <option value="high">🟠 Alta prioridad</option>
+        <select [(ngModel)]="selectedTaskPriority" aria-placeholder="prioridad"
+          class="flex-1 px-3 py-1 w-11/12 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+          <option value="low">🟢 Baja</option>
+          <option value="medium">🟡 Media</option>
+          <option value="high">🟠 Alta</option>
           <option value="urgent">🔴 Urgente</option>
         </select>
         <button (click)="createTask()" [disabled]="!newTaskDescription().trim()"
-          class="px-4 py-1 bg-primary text-white text-sm rounded-lg hover:bg-primary-dark disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors">
+          class="px-3 py-1 bg-primary  text-white text-sm rounded-lg hover:bg-primary-dark disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors">
           Agregar
         </button>
       </div>
