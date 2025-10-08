@@ -117,7 +117,7 @@
     <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
 
       <!-- Días de la semana -->
-      <div class="grid grid-cols-7 bg-gradient-to-r from-primary to-secondary text-white">
+      <div class="grid grid-cols-7 bg-gradient-to-r from-primary to-secondary text-black">
         @for (day of getWeekDayNames(); track day) {
         <div class="p-4 text-center font-semibold uppercase text-sm">
           {{ day }}
@@ -151,7 +151,7 @@
           </div>
 
           <!-- Eventos del día -->
-          <div class="space-y-1 overflow-y-auto max-h-[80px] md:max-h-[100px]">
+          <div class="space-y-1 overflow-y-auto max-h-[80px] md:max-h-[100px] overflow-hidden">
             @for (event of getEventsByDay(day).slice(0, 3); track event.id) {
             <div (click)="onEventClick(event, $event)"
               class="text-xs px-2 py-1 rounded truncate cursor-pointer transition-all hover:shadow-md"

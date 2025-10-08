@@ -1,3 +1,4 @@
+import { ToastService } from '@/app/core/services/toast-service';
 import { CalendarDay, CalendarEvent, EventType } from '@/app/shared/models/calendar.model';
 import { CalendarUtils } from '@/app/shared/utils/calendar.utils';
 import { CommonModule } from '@angular/common';
@@ -14,6 +15,7 @@ import { CalendarService } from './services/calendar-service';
 export class Calendar {
 
   calendarService = inject(CalendarService);
+  private toastService = inject(ToastService);
 
   // View modes
   viewMode = signal<'month' | 'week' | 'day'>('month');
@@ -51,6 +53,10 @@ export class Calendar {
     showGlobal: true,
     showPersonal: true
   });
+
+  constructor() {
+    console.log('Calendar component initialized: ', this.getWeekDayNames());
+  }
 
   ngOnInit(): void {
     this.calendarService.loadCurrentMonthEvents();
@@ -108,12 +114,11 @@ export class Calendar {
 
   createEvent(): void {
     const eventData = this.newEvent();
-    const dateTime = new Date(`${eventData.event_date}T${eventData.event_time || '00:00'}`);
 
     this.calendarService.createEvent({
       title: eventData.title,
       description: eventData.description,
-      event_date: dateTime,
+      event_date: new Date(`${eventData.event_date}T${eventData.event_time || '00:00'}`),
       event_type: eventData.event_type,
       color: eventData.color,
       is_all_day: eventData.is_all_day
@@ -121,10 +126,15 @@ export class Calendar {
       next: () => {
         this.closeCreateModal();
         this.calendarService.loadCurrentMonthEvents();
+
+        // ✅ Toast de éxito
+        this.toastService.success('El evento ha sido creado exitosamente');
       },
       error: (error) => {
         console.error('Error creating event:', error);
-        alert('Error al crear el evento');
+
+        // ❌ Toast de error
+        this.toastService.error('No se pudo crear el evento. Intenta nuevamente.');
       }
     });
   }

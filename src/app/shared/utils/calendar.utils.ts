@@ -14,7 +14,7 @@ export class CalendarUtils {
    */
   static getWeekDayNames(locale: string = 'es-ES', format: 'long' | 'short' = 'short'): string[] {
     const days: string[] = [];
-    const baseDate = new Date(2000, 0, 2); // Domingo
+    const baseDate = new Date(2024, 0, 1); // Lunes 1 de enero de 2024
 
     for (let i = 0; i < 7; i++) {
       const date = new Date(baseDate);

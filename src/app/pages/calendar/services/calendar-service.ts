@@ -89,8 +89,12 @@ export class CalendarService {
     return this.http.get<CalendarEventsResponse>(`${this.API_URL}/events/range`, { params: httpParams })
       .pipe(
         tap(response => {
+          console.log('Response from API:', response);
           if (response.success && response.data) {
-            this.eventsSignal.set(this.parseEvents(response.data));
+            // Verificar si data es un array o un objeto con eventos
+            const eventsArray = Array.isArray(response.data) ? response.data :
+              (response.data as any).events || [];
+            this.eventsSignal.set(this.parseEvents(eventsArray));
           }
           this.isLoadingSignal.set(false);
         }),
