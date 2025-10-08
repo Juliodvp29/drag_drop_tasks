@@ -4,6 +4,7 @@ import { PreloadAllModules, provideRouter, withComponentInputBinding, withPreloa
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { loaderInterceptor } from '@interceptors/loader.interceptor';
 import { routes } from './app.routes';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -15,7 +16,7 @@ export const appConfig: ApplicationConfig = {
       withComponentInputBinding(),
     ),
     provideHttpClient(
-      withInterceptors([loaderInterceptor])
+      withInterceptors([authInterceptor, loaderInterceptor])
     )
   ]
 };

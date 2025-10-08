@@ -1,23 +1,55 @@
-import { Component, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { AuthService } from '@/app/core/services/auth-service';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-side-nav',
-  standalone: true, // Si es un componente standalone
+  standalone: true,
   imports: [RouterLink],
   templateUrl: './side-nav.html',
   styleUrl: './side-nav.scss'
 })
-export class SideNav {
-  // 1. Usar signal para el estado del menú
-  isMobileOpen = signal(false);
+export class SideNav implements OnInit {
 
-  // 2. Modificar el método para usar el signal
+
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
+  isMobileOpen = signal(false);
+  showUserMenu = signal(false);
+
+  public currentUser = this.authService.currentUser;
+  userInitials = computed(() => {
+    const user = this.currentUser();
+    if (!user) return '?';
+    return `${user.first_name[0]}${user.last_name[0]}`.toUpperCase();
+  });
+
+  ngOnInit(): void {
+  }
+
   toggleMobile(): void {
     this.isMobileOpen.update(value => !value);
   }
 
-  // 3. El método para clases CSS puede permanecer o ser un computed signal
+  toggleUserMenu(): void {
+    this.showUserMenu.update(value => !value);
+  }
+
+  logout(): void {
+    if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+      this.authService.logout().subscribe({
+        next: () => {
+          this.router.navigate(['/auth/login']);
+        },
+        error: (error) => {
+          console.error('Error al cerrar sesión:', error);
+          this.router.navigate(['/auth/login']);
+        }
+      });
+    }
+  }
+
   getMenuClasses(): string {
     const baseClasses = 'bg-white shadow-soft-md transition-transform duration-300 ease-in-out border-r border-gray-100';
     const desktopClasses = 'md:fixed md:left-0 md:top-0 md:h-full md:w-64 md:transform-none md:flex md:flex-col';

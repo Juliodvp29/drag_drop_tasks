@@ -23,8 +23,9 @@
           </svg>
         </div>
         <div class="flex-1 min-w-0 md:block hidden">
-          <p class="text-lg font-semibold text-gray-900 truncate">María González</p>
-          <p class="text-sm text-gray-500 truncate">maria@ejemplo.com</p>
+          <p class="text-lg font-semibold text-gray-900 truncate">{{currentUser()?.first_name}}
+            {{currentUser()?.last_name}}</p>
+          <p class="text-sm text-gray-500 truncate">{{currentUser()?.email}}</p>
         </div>
       </div>
 

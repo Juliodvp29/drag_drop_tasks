@@ -1,0 +1,12 @@
+:host {
+  display: block;
+}
+
+.active {
+  background-color: var(--color-primary);
+  color: white;
+
+  svg {
+    color: white !important;
+  }
+}

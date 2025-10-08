@@ -1,0 +1,337 @@
+// src/app/pages/calendar/calendar.scss
+
+:host {
+  display: block;
+}
+
+.calendar-container {
+  min-height: 100vh;
+  animation: fadeIn 0.3s ease-in;
+}
+
+// Animaciones
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideInUp {
+  animation: slideInUp 0.3s ease-out;
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-in;
+}
+
+// Grid del calendario
+.grid {
+  &.grid-cols-7 {
+    >div {
+      position: relative;
+
+      // Efecto hover en días
+      &:hover {
+        z-index: 1;
+      }
+    }
+  }
+}
+
+// Días del calendario
+.min-h-\[120px\],
+.min-h-\[140px\] {
+  &:hover {
+    box-shadow: inset 0 0 0 2px rgba(59, 130, 246, 0.2);
+  }
+
+  // Transiciones suaves
+  transition: all 0.2s ease;
+}
+
+// Eventos dentro de los días
+.space-y-1 {
+  >div {
+    animation: slideInUp 0.2s ease-out;
+
+    &:hover {
+      transform: translateX(2px);
+      z-index: 10;
+    }
+  }
+}
+
+// Scrollbar personalizado
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.5);
+    border-radius: 3px;
+
+    &:hover {
+      background-color: rgba(156, 163, 175, 0.7);
+    }
+  }
+}
+
+// Modales
+.fixed.inset-0 {
+  backdrop-filter: blur(2px);
+}
+
+// Efectos de sombra mejorados
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-2xl {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+// Botones con gradiente
+.bg-gradient-to-r {
+  background-size: 200% auto;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-position: right center;
+  }
+}
+
+// Números de día (círculo)
+.rounded-full {
+  &.bg-yellow-400 {
+    animation: pulse 2s infinite;
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+// Días de la semana header
+.bg-gradient-to-r.from-primary.to-secondary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+}
+
+// Hover effects para botones
+button {
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+// Transiciones para select e input
+select,
+input[type="text"],
+input[type="date"],
+input[type="time"],
+textarea {
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(168, 181, 209, 0.2);
+  }
+}
+
+// Checkbox personalizado
+input[type="checkbox"] {
+  cursor: pointer;
+
+  &:checked {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+}
+
+// Animación para contador de eventos
+.bg-primary.text-white.rounded-full {
+  animation: scaleIn 0.3s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .calendar-container {
+    padding: 0.5rem;
+  }
+
+  .min-h-\[120px\] {
+    min-height: 100px;
+  }
+
+  // Hacer los eventos más pequeños en móvil
+  .text-xs {
+    font-size: 0.65rem;
+  }
+
+  // Ajustar padding en días
+  .grid.grid-cols-7>div {
+    padding: 0.5rem;
+  }
+}
+
+// Mejora visual para días inactivos del mes
+.bg-gray-50 {
+  opacity: 0.6;
+}
+
+// Efecto de elevación para días con eventos
+.group:hover {
+  .absolute.bottom-2.right-2 {
+    animation: bounceIn 0.3s ease-out;
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0);
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+// Estadísticas con animación
+.grid.grid-cols-2,
+.grid.grid-cols-4 {
+  >div {
+    p:first-child {
+      transition: all 0.3s ease;
+    }
+
+    &:hover p:first-child {
+      transform: scale(1.1);
+    }
+  }
+}
+
+// Filtros con transición
+.flex-wrap.gap-3 {
+  button {
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+// Mejorar apariencia del modal
+.max-w-2xl {
+  max-height: 90vh;
+  overflow-y: auto;
+
+  // Scrollbar para el modal
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+
+    &:hover {
+      background: #555;
+    }
+  }
+}
+
+// Loading overlay con blur
+.fixed.inset-0.bg-black.bg-opacity-30 {
+  backdrop-filter: blur(4px);
+
+  >div {
+    animation: scaleIn 0.3s ease-out;
+  }
+}
+
+// Animación de spinner
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+// Efectos adicionales para mejorar UX
+.cursor-pointer {
+  user-select: none;
+}
+
+// Truncate con tooltip behavior
+.truncate {
+  &:hover {
+    overflow: visible;
+    white-space: normal;
+    z-index: 20;
+  }
+}

@@ -1,35 +1,35 @@
+import { environment } from '@/environments/environment';
 import { Injectable, signal } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StorageService {
-  // Utilizamos un signal para almacenar y emitir cambios de la clave 'token'
-  private tokenSignal = signal<string | null>(this.getItem('token'));
+  private tokenSignal = signal<string | null>(this.getItem(environment.tokenKey));
+  private refreshTokenSignal = signal<string | null>(this.getItem(environment.refreshTokenKey));
 
-  // Getter público para acceder al valor del signal
   get token() {
     return this.tokenSignal();
   }
 
-  constructor() {
-    // Si necesitas inicializar algo al cargar el servicio, hazlo aquí.
+  get refreshToken() {
+    return this.refreshTokenSignal();
   }
 
-  // Método para guardar un ítem en el localStorage
   setItem(key: string, value: any): void {
     try {
       localStorage.setItem(key, JSON.stringify(value));
-      // Actualizamos el signal si la clave es 'token'
-      if (key === 'token') {
+
+      if (key === environment.tokenKey) {
         this.tokenSignal.set(value);
+      } else if (key === environment.refreshTokenKey) {
+        this.refreshTokenSignal.set(value);
       }
     } catch (e) {
       console.error('Error saving to localStorage', e);
     }
   }
 
-  // Método para obtener un ítem del localStorage
   getItem(key: string): any {
     try {
       const item = localStorage.getItem(key);
@@ -40,27 +40,58 @@ export class StorageService {
     }
   }
 
-  // Método para eliminar un ítem del localStorage
   removeItem(key: string): void {
     try {
       localStorage.removeItem(key);
-      // Actualizamos el signal si la clave es 'token'
-      if (key === 'token') {
+
+      if (key === environment.tokenKey) {
         this.tokenSignal.set(null);
+      } else if (key === environment.refreshTokenKey) {
+        this.refreshTokenSignal.set(null);
       }
     } catch (e) {
       console.error('Error removing item from localStorage', e);
     }
   }
 
-  // Método para limpiar todo el localStorage
   clear(): void {
     try {
       localStorage.clear();
-      // Limpiamos el signal
       this.tokenSignal.set(null);
+      this.refreshTokenSignal.set(null);
     } catch (e) {
       console.error('Error clearing localStorage', e);
     }
+  }
+
+  setTokens(accessToken: string, refreshToken: string): void {
+    this.setItem(environment.tokenKey, accessToken);
+    this.setItem(environment.refreshTokenKey, refreshToken);
+  }
+
+  clearTokens(): void {
+    this.removeItem(environment.tokenKey);
+    this.removeItem(environment.refreshTokenKey);
+    this.removeItem(environment.userKey);
+  }
+
+  getAccessToken(): string | null {
+    return this.getItem(environment.tokenKey);
+  }
+
+  getRefreshToken(): string | null {
+    return this.getItem(environment.refreshTokenKey);
+  }
+
+  setUser(user: any): void {
+    this.setItem(environment.userKey, user);
+  }
+
+  getUser(): any {
+    return this.getItem(environment.userKey);
+  }
+
+  hasValidToken(): boolean {
+    return !!this.getAccessToken();
   }
 }
