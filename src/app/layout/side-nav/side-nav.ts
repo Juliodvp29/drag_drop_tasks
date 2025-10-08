@@ -1,5 +1,5 @@
 import { AuthService } from '@/app/core/services/auth-service';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 
 @Component({
@@ -9,7 +9,8 @@ import { Router, RouterLink } from '@angular/router';
   templateUrl: './side-nav.html',
   styleUrl: './side-nav.scss'
 })
-export class SideNav {
+export class SideNav implements OnInit {
+
 
   private authService = inject(AuthService);
   private router = inject(Router);
@@ -17,12 +18,15 @@ export class SideNav {
   isMobileOpen = signal(false);
   showUserMenu = signal(false);
 
-  currentUser = this.authService.currentUser;
+  public currentUser = this.authService.currentUser;
   userInitials = computed(() => {
     const user = this.currentUser();
     if (!user) return '?';
     return `${user.first_name[0]}${user.last_name[0]}`.toUpperCase();
   });
+
+  ngOnInit(): void {
+  }
 
   toggleMobile(): void {
     this.isMobileOpen.update(value => !value);
