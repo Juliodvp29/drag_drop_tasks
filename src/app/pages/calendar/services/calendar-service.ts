@@ -12,7 +12,6 @@ export class CalendarService {
   private http = inject(HttpClient);
   private readonly API_URL = `${environment.apiUrl}/calendar`;
 
-  // Signals para gestión de estado
   private eventsSignal = signal<CalendarEvent[]>([]);
   private selectedDateSignal = signal<Date>(new Date());
   private currentMonthSignal = signal<{ month: number; year: number }>({
@@ -21,13 +20,11 @@ export class CalendarService {
   });
   private isLoadingSignal = signal<boolean>(false);
 
-  // Computed signals públicos
   events = computed(() => this.eventsSignal());
   selectedDate = computed(() => this.selectedDateSignal());
   currentMonth = computed(() => this.currentMonthSignal());
   isLoading = computed(() => this.isLoadingSignal());
 
-  // Computed para eventos del mes actual
   currentMonthEvents = computed(() => {
     const { month, year } = this.currentMonth();
     return this.eventsSignal().filter(event => {
@@ -36,7 +33,6 @@ export class CalendarService {
     });
   });
 
-  // Computed para eventos del día seleccionado
   selectedDayEvents = computed(() => {
     const selected = this.selectedDate();
     return this.eventsSignal().filter(event => {

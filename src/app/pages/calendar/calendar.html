@@ -1,12 +1,9 @@
-<!-- src/app/pages/calendar/calendar.html -->
 <div class="calendar-container min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4 md:p-6">
   <div class="max-w-7xl mx-auto">
 
-    <!-- Header -->
     <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-        <!-- Título y navegación -->
         <div class="flex items-center gap-4">
           <div class="flex items-center gap-2">
             <button (click)="previousMonth()" class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
@@ -29,9 +26,7 @@
           </div>
         </div>
 
-        <!-- Acciones -->
         <div class="flex items-center gap-3 flex-wrap">
-          <!-- Botón Hoy -->
           <button (click)="goToToday()"
             class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2">
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -42,7 +37,6 @@
             Hoy
           </button>
 
-          <!-- Botón Crear Evento -->
           <button (click)="openCreateModal(selectedDate())"
             class="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -51,7 +45,6 @@
             Nuevo Evento
           </button>
 
-          <!-- Botón Filtros -->
           <button (click)="showFilters.set(!showFilters())"
             class="p-2 rounded-lg border-2 border-gray-300 hover:border-primary transition-colors"
             [class.border-primary]="showFilters()" [class.bg-primary]="showFilters()"
@@ -64,7 +57,6 @@
         </div>
       </div>
 
-      <!-- Filtros (expandible) -->
       @if (showFilters()) {
       <div class="mt-4 pt-4 border-t border-gray-200 animate-slideInUp">
         <div class="flex flex-wrap gap-3">
@@ -92,7 +84,6 @@
       </div>
       }
 
-      <!-- Estadísticas -->
       <div class="mt-4 pt-4 border-t border-gray-200 grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="text-center">
           <p class="text-2xl font-bold text-primary">{{ getTotalEventsCount() }}</p>
@@ -113,10 +104,8 @@
       </div>
     </div>
 
-    <!-- Calendario Principal -->
     <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
 
-      <!-- Días de la semana -->
       <div class="grid grid-cols-7 bg-gradient-to-r from-primary to-secondary text-black">
         @for (day of getWeekDayNames(); track day) {
         <div class="p-4 text-center font-semibold uppercase text-sm">
@@ -125,7 +114,6 @@
         }
       </div>
 
-      <!-- Días del mes -->
       <div class="grid grid-cols-7 divide-x divide-y divide-gray-200">
         @for (week of calendarMonth().weeks; track $index) {
         @for (day of week; track day.date) {
@@ -134,7 +122,6 @@
           [class.bg-gray-50]="!day.isCurrentMonth" [class.bg-blue-100]="isDaySelected(day) && day.isCurrentMonth"
           [class.bg-yellow-50]="day.isToday && !isDaySelected(day)" [class.border-2]="day.isToday"
           [class.border-yellow-400]="day.isToday">
-          <!-- Número del día -->
           <div class="flex items-center justify-between mb-2">
             <span class="text-sm font-semibold rounded-full w-8 h-8 flex items-center justify-center"
               [class.text-gray-400]="!day.isCurrentMonth" [class.text-gray-900]="day.isCurrentMonth && !day.isToday"
@@ -292,7 +279,7 @@
 
       <!-- Acciones -->
       <div class="mt-6 flex gap-3">
-        <button (click)="deleteEvent(selectedEvent()!.id)"
+        <button (click)="deleteEvent(selectedEvent()!.id, selectedEvent()!.title)"
           class="flex-1 px-4 py-2 bg-error text-white rounded-lg hover:bg-red-600 transition-colors">
           Eliminar
         </button>
@@ -316,7 +303,6 @@
       <h2 class="text-2xl font-bold text-gray-800 mb-6">Crear Nuevo Evento</h2>
 
       <form (submit)="$event.preventDefault(); createEvent()" class="space-y-4">
-        <!-- Título -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Título *</label>
           <input type="text" [(ngModel)]="newEvent().title" name="title" required
@@ -324,7 +310,6 @@
             placeholder="Nombre del evento" />
         </div>
 
-        <!-- Descripción -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
           <textarea [(ngModel)]="newEvent().description" name="description" rows="3"
@@ -332,7 +317,6 @@
             placeholder="Detalles del evento"></textarea>
         </div>
 
-        <!-- Fecha y Hora -->
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Fecha *</label>
@@ -346,7 +330,6 @@
           </div>
         </div>
 
-        <!-- Tipo de evento -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de evento *</label>
           <select [(ngModel)]="newEvent().event_type" name="event_type"
@@ -359,14 +342,12 @@
           </select>
         </div>
 
-        <!-- Todo el día -->
         <div class="flex items-center gap-2">
           <input type="checkbox" [(ngModel)]="newEvent().is_all_day" name="is_all_day" id="is_all_day"
             class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary" />
           <label for="is_all_day" class="text-sm text-gray-700">Evento de todo el día</label>
         </div>
 
-        <!-- Botones -->
         <div class="flex gap-3 pt-4">
           <button type="submit"
             class="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all">
@@ -383,7 +364,6 @@
 </div>
 }
 
-<!-- Loading Overlay -->
 @if (isLoading()) {
 <div class="fixed inset-0 bg-black bg-opacity-30 z-40 flex items-center justify-center">
   <div class="bg-white rounded-2xl p-6 shadow-2xl">
