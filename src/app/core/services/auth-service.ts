@@ -16,11 +16,9 @@ export class AuthService {
 
   private readonly API_URL = environment.apiUrl;
 
-  // Signals para gestión de estado
   private currentUserSignal = signal<User | null>(this.loadUserFromStorage());
   private isAuthenticatedSignal = signal<boolean>(this.storageService.hasValidToken());
 
-  // Computed signals públicos
   currentUser = computed(() => this.currentUserSignal());
   isAuthenticated = computed(() => this.isAuthenticatedSignal());
   userPermissions = computed(() => this.currentUserSignal()?.role?.permissions || []);
@@ -31,7 +29,6 @@ export class AuthService {
   }
 
   private initializeAuth(): void {
-    // Verificar si hay un usuario almacenado
     const storedUser = this.loadUserFromStorage();
     if (storedUser && this.storageService.hasValidToken()) {
       this.currentUserSignal.set(storedUser);

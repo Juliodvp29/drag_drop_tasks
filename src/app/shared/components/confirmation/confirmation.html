@@ -1,0 +1,32 @@
+@if (showModal() && config()) {
+<!-- Overlay -->
+<div class="confirmation-overlay" (click)="onCancel()">
+</div>
+
+<!-- Modal -->
+<div [class]="getModalClasses()" (click)="$event.stopPropagation()">
+
+  <!-- Header con icono -->
+  <div class="modal-header">
+    <div class="modal-icon">
+      {{ config()!.icon }}
+    </div>
+  </div>
+
+  <!-- Contenido -->
+  <div class="modal-body">
+    <h2 class="modal-title">{{ config()!.title }}</h2>
+    <p class="modal-message">{{ config()!.message }}</p>
+  </div>
+
+  <!-- Botones -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-cancel" (click)="onCancel()">
+      {{ config()!.cancelText }}
+    </button>
+    <button type="button" [class]="'btn ' + getConfirmButtonClass()" (click)="onConfirm()">
+      {{ config()!.confirmText }}
+    </button>
+  </div>
+</div>
+}

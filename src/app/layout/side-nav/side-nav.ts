@@ -1,4 +1,5 @@
 import { AuthService } from '@/app/core/services/auth-service';
+import { ToastService } from '@/app/core/services/toast-service';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 
@@ -13,6 +14,7 @@ export class SideNav implements OnInit {
 
 
   private authService = inject(AuthService);
+  private toastService = inject(ToastService);
   private router = inject(Router);
 
   isMobileOpen = signal(false);
@@ -37,17 +39,7 @@ export class SideNav implements OnInit {
   }
 
   logout(): void {
-    if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-      this.authService.logout().subscribe({
-        next: () => {
-          this.router.navigate(['/auth/login']);
-        },
-        error: (error) => {
-          console.error('Error al cerrar sesión:', error);
-          this.router.navigate(['/auth/login']);
-        }
-      });
-    }
+    this.authService.logout().subscribe()
   }
 
   getMenuClasses(): string {

@@ -1,7 +1,9 @@
+import { ConfirmationService } from '@/app/core/services/confirmation-service';
+import { ToastService } from '@/app/core/services/toast-service';
 import { CalendarDay, CalendarEvent, EventType } from '@/app/shared/models/calendar.model';
 import { CalendarUtils } from '@/app/shared/utils/calendar.utils';
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CalendarService } from './services/calendar-service';
 
@@ -11,17 +13,17 @@ import { CalendarService } from './services/calendar-service';
   templateUrl: './calendar.html',
   styleUrl: './calendar.scss'
 })
-export class Calendar {
+export class Calendar implements OnInit {
 
   calendarService = inject(CalendarService);
+  confirmationService = inject(ConfirmationService);
+  private toastService = inject(ToastService);
 
-  // View modes
   viewMode = signal<'month' | 'week' | 'day'>('month');
   showEventModal = signal(false);
   selectedEvent = signal<CalendarEvent | null>(null);
   showCreateModal = signal(false);
 
-  // Calendar data
   calendarMonth = computed(() => this.calendarService.generateCalendarMonth());
   currentMonth = this.calendarService.currentMonth;
   selectedDate = this.calendarService.selectedDate;
@@ -29,11 +31,9 @@ export class Calendar {
   selectedDayEvents = this.calendarService.selectedDayEvents;
   isLoading = this.calendarService.isLoading;
 
-  // Utilidades
   utils = CalendarUtils;
   EventType = EventType;
 
-  // Para el formulario de crear evento
   newEvent = signal({
     title: '',
     description: '',
@@ -44,7 +44,6 @@ export class Calendar {
     is_all_day: false
   });
 
-  // Filtros
   showFilters = signal(false);
   filters = signal({
     eventTypes: [] as EventType[],
@@ -52,11 +51,14 @@ export class Calendar {
     showPersonal: true
   });
 
+  constructor() {
+    console.log('Calendar component initialized: ', this.getWeekDayNames());
+  }
+
   ngOnInit(): void {
     this.calendarService.loadCurrentMonthEvents();
   }
 
-  // Navegación del calendario
   previousMonth(): void {
     this.calendarService.changeMonth('prev');
   }
@@ -69,7 +71,6 @@ export class Calendar {
     this.calendarService.goToToday();
   }
 
-  // Manejo de días
   onDayClick(day: CalendarDay): void {
     this.calendarService.selectDate(day.date);
   }
@@ -81,7 +82,6 @@ export class Calendar {
       day.date.getFullYear() === selected.getFullYear();
   }
 
-  // Manejo de eventos
   onEventClick(event: CalendarEvent, $event: Event): void {
     $event.stopPropagation();
     this.selectedEvent.set(event);
@@ -108,12 +108,11 @@ export class Calendar {
 
   createEvent(): void {
     const eventData = this.newEvent();
-    const dateTime = new Date(`${eventData.event_date}T${eventData.event_time || '00:00'}`);
 
     this.calendarService.createEvent({
       title: eventData.title,
       description: eventData.description,
-      event_date: dateTime,
+      event_date: new Date(`${eventData.event_date}T${eventData.event_time || '00:00'}`),
       event_type: eventData.event_type,
       color: eventData.color,
       is_all_day: eventData.is_all_day
@@ -121,29 +120,34 @@ export class Calendar {
       next: () => {
         this.closeCreateModal();
         this.calendarService.loadCurrentMonthEvents();
+
+        this.toastService.success('El evento ha sido creado exitosamente');
       },
       error: (error) => {
         console.error('Error creating event:', error);
-        alert('Error al crear el evento');
+
+        this.toastService.error('No se pudo crear el evento. Intenta nuevamente.');
       }
     });
   }
 
-  deleteEvent(id: number): void {
-    if (confirm('¿Estás seguro de que deseas eliminar este evento?')) {
-      this.calendarService.deleteEvent(id).subscribe({
-        next: () => {
-          this.closeEventModal();
-        },
-        error: (error) => {
-          console.error('Error deleting event:', error);
-          alert('Error al eliminar el evento');
+  deleteEvent(id: number, eventName: string): void {
+    this.confirmationService.confirmDelete(eventName)
+      .subscribe(confirmed => {
+        if (confirmed) {
+          this.calendarService.deleteEvent(id).subscribe({
+            next: () => {
+              this.closeEventModal();
+              this.toastService.success('Evento eliminado exitosamente');
+            },
+            error: () => {
+              this.toastService.error('Error al eliminar el evento');
+            }
+          });
         }
       });
-    }
   }
 
-  // Utilidades de formato
   formatDateForInput(date: Date): string {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -164,12 +168,10 @@ export class Calendar {
     return day.events.filter(event => {
       const filters = this.filters();
 
-      // Filtrar por tipo
       if (filters.eventTypes.length > 0 && !filters.eventTypes.includes(event.event_type)) {
         return false;
       }
 
-      // Filtrar por global/personal
       if (!filters.showGlobal && event.is_global) return false;
       if (!filters.showPersonal && !event.is_global) return false;
 
@@ -198,7 +200,6 @@ export class Calendar {
     });
   }
 
-  // Estadísticas
   getTotalEventsCount(): number {
     return this.calendarService.currentMonthEvents().length;
   }
