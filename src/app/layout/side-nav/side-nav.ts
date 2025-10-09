@@ -2,11 +2,12 @@ import { AuthService } from '@/app/core/services/auth-service';
 import { ToastService } from '@/app/core/services/toast-service';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { HasPermissionDirective } from "@/app/shared/directives/has-permission.directive";
 
 @Component({
   selector: 'app-side-nav',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, HasPermissionDirective],
   templateUrl: './side-nav.html',
   styleUrl: './side-nav.scss'
 })
@@ -19,6 +20,7 @@ export class SideNav implements OnInit {
 
   isMobileOpen = signal(false);
   showUserMenu = signal(false);
+  showAdminMenu = signal(false);
 
   public currentUser = this.authService.currentUser;
   userInitials = computed(() => {
@@ -36,6 +38,10 @@ export class SideNav implements OnInit {
 
   toggleUserMenu(): void {
     this.showUserMenu.update(value => !value);
+  }
+
+  toggleAdminMenu(): void {
+    this.showAdminMenu.update(value => !value);
   }
 
   logout(): void {
