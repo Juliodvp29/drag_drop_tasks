@@ -1,9 +1,9 @@
-import { Task } from "@models/task.model";
+import { ApiTask } from "./task.model";
 
 export interface TaskList {
   id: string;
   name: string;
   createdAt: Date;
-  tasks: Task[];
+  tasks: ApiTask[];
   color?: string;
 }

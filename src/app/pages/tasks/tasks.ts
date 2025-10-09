@@ -17,28 +17,40 @@ export class Tasks implements OnInit {
   taskService = inject(TaskService);
 
   newListName = signal('');
+  newListDescription = signal('');
   selectedColor = signal<string>('');
+  showDescriptionInput = signal(false);
 
   ngOnInit(): void {
-
+    // Las listas se cargan automáticamente en el constructor del servicio
   }
 
-  createNewList(): void {
+  async createNewList(): Promise<void> {
     const name = this.newListName().trim();
-    if (name) {
-      console.log('this.selectedColor(): ', this.selectedColor())
-      this.taskService.createList(name, this.selectedColor() || undefined);
-      this.newListName.set('');
-      this.selectedColor.set('');
-    }
+    if (!name) return;
+
+    const description = this.newListDescription().trim() || undefined;
+    const color = this.selectedColor() || undefined;
+
+    await this.taskService.createList(name, color, description);
+
+    // Limpiar formulario
+    this.newListName.set('');
+    this.newListDescription.set('');
+    this.selectedColor.set('');
+    this.showDescriptionInput.set(false);
   }
 
-  onTaskMoved(event: { taskId: string; sourceListId: string; targetListId: string }): void {
-    this.taskService.moveTask(event.taskId, event.sourceListId, event.targetListId);
+  async onTaskMoved(event: { taskId: number; sourceListId: number; targetListId: number }): Promise<void> {
+    await this.taskService.moveTask(event.taskId, event.sourceListId, event.targetListId);
   }
 
   onColorChange(event: ColorChangeEvent): void {
     this.selectedColor.set(event.hex || '');
+  }
+
+  toggleDescriptionInput(): void {
+    this.showDescriptionInput.set(!this.showDescriptionInput());
   }
 
 }

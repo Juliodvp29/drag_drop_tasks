@@ -1,131 +1,296 @@
-import { Task, TaskPriority } from "../models/task.model";
+import { ApiTask, TaskPriority, TaskStatus } from "../models/task.model";
 
 export class TaskUtils {
-  // Orden de prioridad (mayor número = mayor prioridad)
-  private static readonly PRIORITY_ORDER = {
-    [TaskPriority.URGENT]: 4,
-    [TaskPriority.HIGH]: 3,
-    [TaskPriority.MEDIUM]: 2,
-    [TaskPriority.LOW]: 1
-  };
 
   /**
-   * Ordena las tareas por prioridad (urgente primero) y luego por fecha de creación
-   */
-  static sortTasksByPriority(tasks: Task[]): Task[] {
-    return [...tasks].sort((a, b) => {
-      // Si una está completada y la otra no, la no completada va primero
-      if (a.finishedAt && !b.finishedAt) return 1;
-      if (!a.finishedAt && b.finishedAt) return -1;
+  * Convierte fecha ISO string a objeto Date
+  */
+  static parseDate(dateString: string): Date {
+    return new Date(dateString);
+  }
 
-      // Si ambas tienen el mismo estado de completación, ordenar por prioridad
-      const priorityDiff = this.PRIORITY_ORDER[b.priority] - this.PRIORITY_ORDER[a.priority];
+  /**
+   * Formatea fecha para mostrar
+   */
+  static formatDate(dateString: string, locale: string = 'es-ES'): string {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat(locale, {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(date);
+  }
+
+  /**
+   * Formatea fecha relativa (hace 2 horas, ayer, etc.)
+   */
+  static formatRelativeDate(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'hace un momento';
+    if (diffMins < 60) return `hace ${diffMins} minuto${diffMins > 1 ? 's' : ''}`;
+    if (diffHours < 24) return `hace ${diffHours} hora${diffHours > 1 ? 's' : ''}`;
+    if (diffDays < 7) return `hace ${diffDays} día${diffDays > 1 ? 's' : ''}`;
+
+    return this.formatDate(dateString);
+  }
+
+  /**
+   * Verifica si una tarea está vencida
+   */
+  static isTaskOverdue(task: ApiTask): boolean {
+    if (!task.due_date || task.status === TaskStatus.COMPLETED) {
+      return false;
+    }
+    return new Date(task.due_date) < new Date();
+  }
+
+  /**
+   * Obtiene el color según la prioridad
+   */
+  static getPriorityColor(priority: TaskPriority): string {
+    switch (priority) {
+      case TaskPriority.LOW:
+        return '#10b981'; // green
+      case TaskPriority.MEDIUM:
+        return '#3b82f6'; // blue
+      case TaskPriority.HIGH:
+        return '#f59e0b'; // yellow
+      case TaskPriority.URGENT:
+        return '#ef4444'; // red
+      default:
+        return '#6b7280'; // gray
+    }
+  }
+
+  /**
+   * Obtiene el color según el estado
+   */
+  static getStatusColor(status: TaskStatus): string {
+    switch (status) {
+      case TaskStatus.PENDING:
+        return '#6b7280'; // gray
+      case TaskStatus.IN_PROGRESS:
+        return '#3b82f6'; // blue
+      case TaskStatus.COMPLETED:
+        return '#10b981'; // green
+      case TaskStatus.CANCELLED:
+        return '#ef4444'; // red
+      default:
+        return '#6b7280';
+    }
+  }
+
+  /**
+   * Obtiene el label traducido del estado
+   */
+  static getStatusLabel(status: TaskStatus): string {
+    switch (status) {
+      case TaskStatus.PENDING:
+        return 'Pendiente';
+      case TaskStatus.IN_PROGRESS:
+        return 'En Progreso';
+      case TaskStatus.COMPLETED:
+        return 'Completada';
+      case TaskStatus.CANCELLED:
+        return 'Cancelada';
+      default:
+        return 'Desconocido';
+    }
+  }
+
+  /**
+   * Ordena tareas por prioridad y fecha
+   */
+  static sortTasks(tasks: ApiTask[]): ApiTask[] {
+    const priorityOrder = {
+      [TaskPriority.URGENT]: 4,
+      [TaskPriority.HIGH]: 3,
+      [TaskPriority.MEDIUM]: 2,
+      [TaskPriority.LOW]: 1
+    };
+
+    return [...tasks].sort((a, b) => {
+      // Completadas al final
+      const aCompleted = a.status === TaskStatus.COMPLETED || !!a.completed_at;
+      const bCompleted = b.status === TaskStatus.COMPLETED || !!b.completed_at;
+
+      if (aCompleted && !bCompleted) return 1;
+      if (!aCompleted && bCompleted) return -1;
+
+      // Por prioridad
+      const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority];
       if (priorityDiff !== 0) return priorityDiff;
 
-      // Si tienen la misma prioridad, ordenar por fecha de creación (más reciente primero)
-      return b.createdAt.getTime() - a.createdAt.getTime();
+      // Por fecha de vencimiento (las más próximas primero)
+      if (a.due_date && b.due_date) {
+        const dueDateDiff = new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
+        if (dueDateDiff !== 0) return dueDateDiff;
+      }
+      if (a.due_date && !b.due_date) return -1;
+      if (!a.due_date && b.due_date) return 1;
+
+      // Por fecha de creación (más recientes primero)
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+  }
+
+
+  static sortTasksByPriority(tasks: ApiTask[]): ApiTask[] {
+    const priorityOrder = {
+      [TaskPriority.URGENT]: 4,
+      [TaskPriority.HIGH]: 3,
+      [TaskPriority.MEDIUM]: 2,
+      [TaskPriority.LOW]: 1
+    };
+    return [...tasks].sort((a, b) => {
+      return priorityOrder[b.priority] - priorityOrder[a.priority];
     });
   }
 
   /**
-   * Obtiene el color del borde según la prioridad
+   * Filtra tareas por estado
    */
-  static getPriorityBorderClass(priority: TaskPriority): string {
-    switch (priority) {
-      case TaskPriority.LOW:
-        return 'border-l-success';
-      case TaskPriority.MEDIUM:
-        return 'border-l-info';
-      case TaskPriority.HIGH:
-        return 'border-l-warning';
-      case TaskPriority.URGENT:
-        return 'border-l-error';
-      default:
-        return 'border-l-gray-300';
-    }
-  }
-
-  /**
-   * Obtiene la clase CSS para el badge de prioridad
-   */
-  static getPriorityBadgeClass(priority: TaskPriority): string {
-    switch (priority) {
-      case TaskPriority.LOW:
-        return 'bg-success bg-opacity-20 text-green-700';
-      case TaskPriority.MEDIUM:
-        return 'bg-info bg-opacity-20 text-blue-700';
-      case TaskPriority.HIGH:
-        return 'bg-warning bg-opacity-20 text-yellow-700';
-      case TaskPriority.URGENT:
-        return 'bg-error bg-opacity-20 text-red-700';
-      default:
-        return 'bg-gray-200 text-gray-700';
-    }
-  }
-
-  /**
-   * Obtiene el emoji según la prioridad
-   */
-  static getPriorityIcon(priority: TaskPriority): string {
-    switch (priority) {
-      case TaskPriority.LOW:
-        return '🟢';
-      case TaskPriority.MEDIUM:
-        return '🟡';
-      case TaskPriority.HIGH:
-        return '🟠';
-      case TaskPriority.URGENT:
-        return '🔴';
-      default:
-        return '⚪';
-    }
-  }
-
-  /**
-   * Obtiene el label de la prioridad
-   */
-  static getPriorityLabel(priority: TaskPriority): string {
-    switch (priority) {
-      case TaskPriority.LOW:
-        return 'Baja';
-      case TaskPriority.MEDIUM:
-        return 'Media';
-      case TaskPriority.HIGH:
-        return 'Alta';
-      case TaskPriority.URGENT:
-        return 'Urgente';
-      default:
-        return 'Normal';
-    }
+  static filterTasksByStatus(tasks: ApiTask[], status: TaskStatus): ApiTask[] {
+    return tasks.filter(task => task.status === status);
   }
 
   /**
    * Filtra tareas por prioridad
    */
-  static filterTasksByPriority(tasks: Task[], priority: TaskPriority): Task[] {
+  static filterTasksByPriority(tasks: ApiTask[], priority: TaskPriority): ApiTask[] {
     return tasks.filter(task => task.priority === priority);
   }
 
   /**
-   * Cuenta tareas por prioridad
+   * Filtra tareas vencidas
    */
-  static countTasksByPriority(tasks: Task[], priority: TaskPriority): number {
-    return tasks.filter(task => task.priority === priority && !task.finishedAt).length;
+  static filterOverdueTasks(tasks: ApiTask[]): ApiTask[] {
+    return tasks.filter(task => this.isTaskOverdue(task));
   }
 
   /**
-   * Obtiene estadísticas de prioridades
+   * Busca tareas por término
    */
-  static getPriorityStats(tasks: Task[]) {
-    const activeTasks = tasks.filter(task => !task.finishedAt);
+  static searchTasks(tasks: ApiTask[], searchTerm: string): ApiTask[] {
+    const term = searchTerm.toLowerCase().trim();
+    if (!term) return tasks;
+
+    return tasks.filter(task =>
+      task.title.toLowerCase().includes(term) ||
+      task.description?.toLowerCase().includes(term) ||
+      task.tags?.some(tag => tag.toLowerCase().includes(term))
+    );
+  }
+
+  /**
+   * Calcula estadísticas de tareas
+   */
+  static getTaskStats(tasks: ApiTask[]) {
+    const total = tasks.length;
+    const completed = tasks.filter(t => t.status === TaskStatus.COMPLETED).length;
+    const pending = tasks.filter(t => t.status === TaskStatus.PENDING).length;
+    const inProgress = tasks.filter(t => t.status === TaskStatus.IN_PROGRESS).length;
+    const cancelled = tasks.filter(t => t.status === TaskStatus.CANCELLED).length;
+    const overdue = this.filterOverdueTasks(tasks).length;
 
     return {
-      urgent: this.countTasksByPriority(tasks, TaskPriority.URGENT),
-      high: this.countTasksByPriority(tasks, TaskPriority.HIGH),
-      medium: this.countTasksByPriority(tasks, TaskPriority.MEDIUM),
-      low: this.countTasksByPriority(tasks, TaskPriority.LOW),
-      total: activeTasks.length,
-      completed: tasks.filter(task => task.finishedAt).length
+      total,
+      completed,
+      pending,
+      inProgress,
+      cancelled,
+      overdue,
+      completionRate: total > 0 ? Math.round((completed / total) * 100) : 0,
+      activeCount: pending + inProgress
     };
+  }
+
+  /**
+   * Calcula estadísticas de prioridad
+   */
+  static getPriorityStats(tasks: ApiTask[]) {
+    const activeTasks = tasks.filter(
+      t => t.status !== TaskStatus.COMPLETED && t.status !== TaskStatus.CANCELLED
+    );
+
+    return {
+      urgent: activeTasks.filter(t => t.priority === TaskPriority.URGENT).length,
+      high: activeTasks.filter(t => t.priority === TaskPriority.HIGH).length,
+      medium: activeTasks.filter(t => t.priority === TaskPriority.MEDIUM).length,
+      low: activeTasks.filter(t => t.priority === TaskPriority.LOW).length,
+      total: activeTasks.length
+    };
+  }
+
+  /**
+   * Valida una fecha de vencimiento
+   */
+  static isValidDueDate(dueDate: string): boolean {
+    const date = new Date(dueDate);
+    return !isNaN(date.getTime());
+  }
+
+  /**
+   * Calcula tiempo restante hasta la fecha de vencimiento
+   */
+  static getTimeUntilDue(dueDate: string): string {
+    const now = new Date();
+    const due = new Date(dueDate);
+    const diffMs = due.getTime() - now.getTime();
+
+    if (diffMs < 0) return 'Vencida';
+
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 60) return `${diffMins} minutos`;
+    if (diffHours < 24) return `${diffHours} hora${diffHours > 1 ? 's' : ''}`;
+    if (diffDays < 7) return `${diffDays} día${diffDays > 1 ? 's' : ''}`;
+
+    const weeks = Math.floor(diffDays / 7);
+    return `${weeks} semana${weeks > 1 ? 's' : ''}`;
+  }
+
+  /**
+   * Genera un color aleatorio para una lista
+   */
+  static getRandomColor(): string {
+    const colors = [
+      '#ef4444', // red
+      '#f59e0b', // orange
+      '#10b981', // green
+      '#3b82f6', // blue
+      '#8b5cf6', // purple
+      '#ec4899', // pink
+      '#14b8a6', // teal
+      '#f97316', // orange
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  /**
+   * Convierte tags string a array
+   */
+  static parseTags(tagsInput: string): string[] {
+    return tagsInput
+      .split(',')
+      .map(tag => tag.trim())
+      .filter(tag => tag.length > 0);
+  }
+
+  /**
+   * Convierte array de tags a string
+   */
+  static stringifyTags(tags: string[]): string {
+    return tags.join(', ');
   }
 }

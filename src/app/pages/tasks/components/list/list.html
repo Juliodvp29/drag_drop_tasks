@@ -1,5 +1,6 @@
-<div class="bg-white rounded-xl shadow-lg overflow-hidden border-t-4" [style.borderColor]="list.color"
+<div class="bg-white rounded-xl shadow-lg overflow-hidden border-t-4" [style.borderColor]="list.color || '#3b82f6'"
   (dragover)="onDragOver($event)" (drop)="onDrop($event)">
+
   <!-- Header de la lista -->
   <div class="p-4 border-b border-gray-100">
     <div class="flex items-center justify-between mb-2">
@@ -27,9 +28,14 @@
       </div>
     </div>
 
+    <!-- Descripción de la lista -->
+    @if (list.description) {
+    <p class="text-sm text-gray-600 mb-2">{{ list.description }}</p>
+    }
+
     <div class="flex items-center justify-between text-sm text-gray-500">
-      <span>{{ list.tasks.length }} tareas</span>
-      <span>{{ formatDate(list.createdAt) }}</span>
+      <span>{{ (list.tasks || []).length }} tareas</span>
+      <span>{{ formatDate(list.created_at) }}</span>
     </div>
 
     <!-- Opciones de la lista -->
@@ -46,9 +52,24 @@
   <!-- Formulario para agregar tarea -->
   <div class="p-4 border-b border-gray-100">
     <div class="space-y-2">
-      <input type="text" placeholder="Agregar nueva tarea..." [(ngModel)]="newTaskDescription"
-        (keyup.enter)="createTask()"
+      <input type="text" placeholder="Agregar nueva tarea..." [(ngModel)]="newTaskTitle"
+        (keyup.enter)="!showDescriptionInput() && createTask()"
         class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
+
+      <!-- Botón para mostrar campo de descripción -->
+      @if (!showDescriptionInput() && newTaskTitle().trim()) {
+      <button (click)="toggleDescriptionInput()" class="text-xs text-gray-500 hover:text-gray-700">
+        + Agregar descripción
+      </button>
+      }
+
+      <!-- Campo de descripción (opcional) -->
+      @if (showDescriptionInput()) {
+      <textarea placeholder="Descripción (opcional)..." [(ngModel)]="newTaskDescription" rows="2"
+        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+      </textarea>
+      }
+
       <div class="flex gap-2">
         <select [(ngModel)]="selectedTaskPriority" aria-placeholder="prioridad"
           class="flex-1 px-3 py-1 w-11/12 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
@@ -57,8 +78,8 @@
           <option value="high">🟠 Alta</option>
           <option value="urgent">🔴 Urgente</option>
         </select>
-        <button (click)="createTask()" [disabled]="!newTaskDescription().trim()"
-          class="px-3 py-1 bg-primary  text-white text-sm rounded-lg hover:bg-primary-dark disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors">
+        <button (click)="createTask()" [disabled]="!newTaskTitle().trim()"
+          class="px-3 py-1 bg-primary text-white text-sm rounded-lg hover:bg-primary-dark disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors">
           Agregar
         </button>
       </div>
@@ -67,7 +88,7 @@
 
   <!-- Lista de tareas -->
   <div class="max-h-96 overflow-y-auto">
-    @if (list.tasks.length === 0) {
+    @if ((list.tasks || []).length === 0) {
     <div class="p-8 text-center text-gray-400">
       <div class="text-3xl mb-2">📝</div>
       <p class="text-sm">No hay tareas aquí</p>
@@ -75,7 +96,7 @@
     </div>
     } @else {
     <div class="p-2 space-y-2">
-      @for (task of (list.tasks | sortTasks); track task.id) {
+      @for (task of sortedTasks(); track task.id) {
       <app-card [task]="task" (taskMoved)="onTaskMoved($event)" (taskDeleted)="onTaskDeleted($event)"
         (taskCompleted)="onTaskCompleted($event)" />
       }
