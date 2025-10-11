@@ -3,6 +3,8 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth-service';
 import { LoaderService } from '../../../core/services/loader-service';
+import { StorageService } from '../../../core/services/storage-service';
+import { ThemeService } from '../../../core/services/theme-service';
 import { ToastService } from '../../../core/services/toast-service';
 import { User } from '../../../shared/models/auth.model';
 import { UpdateUserRequest, UserSettings } from '../../../shared/models/user-management.model';
@@ -18,6 +20,8 @@ export class SettingsProfile implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private userManagementService = inject(UserManagementService);
+  private storageService = inject(StorageService);
+  private themeService = inject(ThemeService);
   private toastService = inject(ToastService);
   private loaderService = inject(LoaderService);
 
@@ -47,7 +51,7 @@ export class SettingsProfile implements OnInit {
     });
 
     this.settingsForm = this.fb.group({
-      theme: ['light'],
+      theme: ['auto'],
       language: ['es'],
       timezone: ['America/Bogota'],
       date_format: ['DD/MM/YYYY'],
@@ -79,13 +83,30 @@ export class SettingsProfile implements OnInit {
       });
     }
 
-    // Cargar configuraciones del usuario
+    // Cargar configuraciones del usuario desde localStorage primero
+    const storedSettings = this.storageService.getUserSettings();
+    if (storedSettings) {
+      this.userSettings.set(storedSettings);
+      this.settingsForm.patchValue(storedSettings);
+      // Sincronizar tema con ThemeService
+      if (storedSettings.theme) {
+        this.themeService.loadFromUserSettings(storedSettings.theme);
+      }
+    }
+
+    // Luego cargar desde API para asegurar datos actualizados
     if (user?.id) {
       this.userManagementService.getUserSettings(user.id).subscribe({
         next: (response) => {
           if (response.success && response.data.settings) {
             this.userSettings.set(response.data.settings);
             this.settingsForm.patchValue(response.data.settings);
+            // Actualizar localStorage con datos frescos
+            this.storageService.setUserSettings(response.data.settings);
+            // Sincronizar tema con ThemeService
+            if (response.data.settings.theme) {
+              this.themeService.loadFromUserSettings(response.data.settings.theme);
+            }
           }
         },
         error: (error) => {
@@ -170,6 +191,12 @@ export class SettingsProfile implements OnInit {
         if (response.success) {
           this.toastService.success('Configuraciones guardadas correctamente');
           this.userSettings.set(settings);
+          // Actualizar localStorage con los nuevos settings
+          this.storageService.setUserSettings(settings);
+          // Sincronizar tema con ThemeService
+          if (settings.theme) {
+            this.themeService.setTheme(settings.theme);
+          }
         } else {
           this.toastService.error('Error al guardar configuraciones');
         }

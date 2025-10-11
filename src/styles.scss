@@ -3,6 +3,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('./themes.scss');
+
 /* 🎨 VARIABLES CSS - Definidas antes de las utilidades */
 
 
@@ -216,4 +218,26 @@ body {
 .input-soft:focus {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 2px var(--color-primary-light);
+}
+
+/* Tema oscuro para inputs globales */
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  border-color: var(--border-primary);
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] select::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+[data-theme="dark"] input:focus,
+[data-theme="dark"] select:focus,
+[data-theme="dark"] textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }

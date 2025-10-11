@@ -1,10 +1,12 @@
 import { ApiResponse, LoginRequest, LoginResponse, RefreshTokenResponse, RegisterRequest, User } from '@/app/shared/models/auth.model';
+import { UserSettings } from '@/app/shared/models/user-management.model';
 import { environment } from '@/environments/environment';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, Observable, tap, throwError } from 'rxjs';
 import { StorageService } from './storage-service';
+import { UserManagementService } from '@/app/pages/admin/service/user-management-service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +15,7 @@ export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
   private storageService = inject(StorageService);
+  private userManagementService = inject(UserManagementService);
 
   private readonly API_URL = environment.apiUrl;
 
@@ -238,6 +241,21 @@ export class AuthService {
     this.storageService.setUser(data.user);
     this.currentUserSignal.set(data.user);
     this.isAuthenticatedSignal.set(true);
+
+    // Obtener y guardar configuraciones del usuario
+    if (data.user.id) {
+      this.userManagementService.getUserSettings(data.user.id).subscribe({
+        next: (response) => {
+          if (response.success && response.data.settings) {
+            this.storageService.setUserSettings(response.data.settings);
+          }
+        },
+        error: (error) => {
+          console.warn('No se pudieron cargar las configuraciones del usuario:', error);
+          // No es crítico, continuar sin settings
+        }
+      });
+    }
   }
 
   /**
@@ -245,6 +263,7 @@ export class AuthService {
    */
   private clearAuthData(): void {
     this.storageService.clearTokens();
+    this.storageService.clearUserSettings();
     this.currentUserSignal.set(null);
     this.isAuthenticatedSignal.set(false);
     this.router.navigate(['/auth/login']);

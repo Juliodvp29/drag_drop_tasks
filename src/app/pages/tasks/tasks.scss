@@ -1,0 +1,98 @@
+// Aplicar tema oscuro a clases de Tailwind hardcodeadas
+:host {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.min-h-screen {
+  background-color: var(--bg-secondary);
+}
+
+.bg-gray-50 {
+  background-color: var(--bg-secondary) !important;
+}
+
+.bg-white {
+  background-color: var(--bg-primary) !important;
+}
+
+.text-gray-800,
+.text-gray-900 {
+  color: var(--text-primary) !important;
+}
+
+.text-gray-600,
+.text-gray-700 {
+  color: var(--text-secondary) !important;
+}
+
+.text-gray-500 {
+  color: var(--text-tertiary) !important;
+}
+
+.text-gray-400 {
+  color: var(--text-tertiary) !important;
+}
+
+.border-gray-300 {
+  border-color: var(--border-primary) !important;
+}
+
+.focus\:ring-primary:focus {
+  --tw-ring-color: var(--color-primary) !important;
+}
+
+.focus\:border-transparent:focus {
+  border-color: var(--color-primary) !important;
+}
+
+.bg-primary {
+  background-color: var(--color-primary) !important;
+}
+
+.text-white {
+  color: white !important;
+}
+
+.hover\:bg-primary-dark:hover {
+  background-color: var(--color-primary-hover) !important;
+}
+
+.disabled\:bg-gray-300:disabled {
+  background-color: var(--bg-tertiary) !important;
+}
+
+.bg-red-50 {
+  background-color: var(--color-error-bg) !important;
+}
+
+.border-red-200 {
+  border-color: var(--color-error) !important;
+}
+
+.text-red-600,
+.text-red-700,
+.text-red-800 {
+  color: var(--color-error) !important;
+}
+
+// Inputs y formularios
+input,
+select,
+textarea {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-primary) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-tertiary) !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--color-primary) !important;
+  --tw-ring-color: var(--color-primary) !important;
+}

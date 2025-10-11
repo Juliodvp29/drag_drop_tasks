@@ -1,0 +1,108 @@
+// Aplicar tema oscuro a clases de Tailwind hardcodeadas
+:host ::ng-deep .bg-white {
+  background-color: var(--bg-primary) !important;
+}
+
+:host ::ng-deep .text-gray-800,
+:host ::ng-deep .text-gray-900 {
+  color: var(--text-primary) !important;
+}
+
+:host ::ng-deep .text-gray-600,
+:host ::ng-deep .text-gray-700 {
+  color: var(--text-secondary) !important;
+}
+
+:host ::ng-deep .text-gray-500 {
+  color: var(--text-tertiary) !important;
+}
+
+:host ::ng-deep .text-gray-400 {
+  color: var(--text-tertiary) !important;
+}
+
+:host ::ng-deep .border-gray-100,
+:host ::ng-deep .border-gray-300 {
+  border-color: var(--border-primary) !important;
+}
+
+:host ::ng-deep .text-gray-400 {
+  color: var(--text-tertiary) !important;
+}
+
+:host ::ng-deep .hover\:text-gray-600:hover {
+  color: var(--text-secondary) !important;
+}
+
+:host ::ng-deep .hover\:text-gray-700:hover {
+  color: var(--text-primary) !important;
+}
+
+:host ::ng-deep .bg-error {
+  background-color: var(--color-error) !important;
+}
+
+:host ::ng-deep .text-red-700 {
+  color: var(--color-error) !important;
+}
+
+:host ::ng-deep .bg-warning {
+  background-color: var(--color-primary) !important;
+}
+
+:host ::ng-deep .text-yellow-700 {
+  color: var(--color-primary) !important;
+}
+
+:host ::ng-deep .bg-primary {
+  background-color: var(--color-primary) !important;
+}
+
+:host ::ng-deep .text-white {
+  color: white !important;
+}
+
+:host ::ng-deep .hover\:bg-primary-dark:hover {
+  background-color: var(--color-primary-hover) !important;
+}
+
+:host ::ng-deep .disabled\:bg-gray-300:disabled {
+  background-color: var(--bg-tertiary) !important;
+}
+
+:host ::ng-deep .focus\:ring-primary:focus {
+  --tw-ring-color: var(--color-primary) !important;
+}
+
+:host ::ng-deep .focus\:border-transparent:focus {
+  border-color: var(--color-primary) !important;
+}
+
+:host ::ng-deep .hover\:bg-error:hover {
+  background-color: var(--color-error-bg) !important;
+}
+
+:host ::ng-deep .text-error {
+  color: var(--color-error) !important;
+}
+
+// Inputs y formularios en el componente list
+:host ::ng-deep input,
+:host ::ng-deep select,
+:host ::ng-deep textarea {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-primary) !important;
+}
+
+:host ::ng-deep input::placeholder,
+:host ::ng-deep textarea::placeholder {
+  color: var(--text-tertiary) !important;
+}
+
+:host ::ng-deep input:focus,
+:host ::ng-deep select:focus,
+:host ::ng-deep textarea:focus {
+  border-color: var(--color-primary) !important;
+  --tw-ring-color: var(--color-primary) !important;
+}

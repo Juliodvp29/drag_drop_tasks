@@ -304,3 +304,236 @@ input[type="checkbox"] {
     z-index: 20;
   }
 }
+
+// Aplicar tema oscuro a clases de Tailwind hardcodeadas
+:host {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+}
+
+:host ::ng-deep .calendar-container {
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%) !important;
+}
+
+// Sobrescribir gradientes de Tailwind
+:host ::ng-deep .bg-gradient-to-br {
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%) !important;
+}
+
+:host ::ng-deep .from-blue-50 {
+  --tw-gradient-from: var(--bg-secondary) !important;
+}
+
+:host ::ng-deep .via-white {
+  --tw-gradient-via: var(--bg-primary) !important;
+}
+
+:host ::ng-deep .to-purple-50 {
+  --tw-gradient-to: var(--bg-tertiary) !important;
+}
+
+:host ::ng-deep .bg-white {
+  background-color: var(--bg-primary) !important;
+}
+
+:host ::ng-deep .text-gray-800,
+:host ::ng-deep .text-gray-900 {
+  color: var(--text-primary) !important;
+}
+
+:host ::ng-deep .text-gray-600,
+:host ::ng-deep .text-gray-700 {
+  color: var(--text-secondary) !important;
+}
+
+:host ::ng-deep .text-gray-500 {
+  color: var(--text-tertiary) !important;
+}
+
+:host ::ng-deep .border-gray-200,
+:host ::ng-deep .border-gray-300 {
+  border-color: var(--border-primary) !important;
+}
+
+:host ::ng-deep .bg-gray-50 {
+  background-color: var(--bg-secondary) !important;
+}
+
+:host ::ng-deep .bg-gray-100 {
+  background-color: var(--bg-tertiary) !important;
+}
+
+:host ::ng-deep .hover\:bg-gray-100:hover {
+  background-color: var(--bg-secondary) !important;
+}
+
+:host ::ng-deep .bg-blue-50 {
+  background-color: var(--bg-secondary) !important;
+}
+
+:host ::ng-deep .bg-blue-100 {
+  background-color: var(--bg-tertiary) !important;
+}
+
+:host ::ng-deep .text-blue-600 {
+  color: var(--color-primary) !important;
+}
+
+:host ::ng-deep .bg-yellow-50 {
+  background-color: var(--bg-secondary) !important;
+}
+
+:host ::ng-deep .bg-yellow-400 {
+  background-color: var(--color-primary) !important;
+}
+
+:host ::ng-deep .text-yellow-400 {
+  color: var(--color-primary) !important;
+}
+
+:host ::ng-deep .bg-purple-100 {
+  background-color: var(--bg-tertiary) !important;
+}
+
+:host ::ng-deep .text-purple-700 {
+  color: var(--color-primary) !important;
+}
+
+:host ::ng-deep .bg-red-50 {
+  background-color: var(--color-error-bg) !important;
+}
+
+:host ::ng-deep .text-red-700,
+:host ::ng-deep .text-red-800 {
+  color: var(--color-error) !important;
+}
+
+:host ::ng-deep .bg-green-100 {
+  background-color: var(--color-success-bg) !important;
+}
+
+:host ::ng-deep .text-green-600 {
+  color: var(--color-success) !important;
+}
+
+:host ::ng-deep .bg-orange-100 {
+  background-color: var(--bg-tertiary) !important;
+}
+
+:host ::ng-deep .text-orange-700 {
+  color: var(--color-primary) !important;
+}
+
+:host ::ng-deep .bg-primary {
+  background-color: var(--color-primary) !important;
+}
+
+:host ::ng-deep .text-primary {
+  color: var(--color-primary) !important;
+}
+
+:host ::ng-deep .border-primary {
+  border-color: var(--color-primary) !important;
+}
+
+:host ::ng-deep .focus\:ring-primary:focus {
+  --tw-ring-color: var(--color-primary) !important;
+}
+
+:host ::ng-deep .focus\:border-primary:focus {
+  border-color: var(--color-primary) !important;
+}
+
+// Sobrescribir clases específicas del calendario
+:host ::ng-deep .bg-white.rounded-2xl.shadow-lg {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+:host ::ng-deep .bg-white.rounded-2xl.shadow-lg h1,
+:host ::ng-deep .bg-white.rounded-2xl.shadow-lg h2,
+:host ::ng-deep .bg-white.rounded-2xl.shadow-lg h3 {
+  color: var(--text-primary) !important;
+}
+
+:host ::ng-deep .bg-white.rounded-2xl.overflow-hidden {
+  background-color: var(--bg-primary) !important;
+}
+
+:host ::ng-deep .grid.grid-cols-7.bg-gradient-to-r.from-primary.to-secondary {
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-secondary) 100%) !important;
+}
+
+:host ::ng-deep .grid.grid-cols-7.bg-gradient-to-r.from-primary.to-secondary div {
+  color: white !important;
+}
+
+:host ::ng-deep .min-h-\[120px\].bg-gray-50,
+:host ::ng-deep .min-h-\[140px\].bg-gray-50 {
+  background-color: var(--bg-secondary) !important;
+}
+
+:host ::ng-deep .min-h-\[120px\].bg-blue-100,
+:host ::ng-deep .min-h-\[140px\].bg-blue-100 {
+  background-color: var(--bg-tertiary) !important;
+}
+
+:host ::ng-deep .min-h-\[120px\].bg-yellow-50,
+:host ::ng-deep .min-h-\[140px\].bg-yellow-50 {
+  background-color: var(--bg-secondary) !important;
+}
+
+:host ::ng-deep .min-h-\[120px\].border-yellow-400,
+:host ::ng-deep .min-h-\[140px\].border-yellow-400 {
+  border-color: var(--color-primary) !important;
+}
+
+// Estados hover para los días del calendario
+:host ::ng-deep .min-h-\[120px\]:hover,
+:host ::ng-deep .min-h-\[140px\]:hover {
+  background-color: var(--bg-tertiary) !important;
+}
+
+:host ::ng-deep .min-h-\[120px\].hover\:bg-blue-50:hover,
+:host ::ng-deep .min-h-\[140px\].hover\:bg-blue-50:hover {
+  background-color: var(--bg-tertiary) !important;
+}
+
+:host ::ng-deep .bg-primary.text-white {
+  background-color: var(--color-primary) !important;
+  color: white !important;
+}
+
+:host ::ng-deep .bg-primary.text-white.rounded-full {
+  background-color: var(--color-primary) !important;
+  color: white !important;
+}
+
+:host ::ng-deep .bg-black.bg-opacity-50 {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+:host ::ng-deep .bg-black.bg-opacity-30 {
+  background-color: rgba(0, 0, 0, 0.3) !important;
+}
+
+:host ::ng-deep .fixed.inset-0.bg-black.bg-opacity-50 .bg-white,
+:host ::ng-deep .fixed.inset-0.bg-black.bg-opacity-30 .bg-white {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+:host ::ng-deep .fixed.inset-0.bg-black.bg-opacity-50 .text-gray-800,
+:host ::ng-deep .fixed.inset-0.bg-black.bg-opacity-30 .text-gray-800 {
+  color: var(--text-primary) !important;
+}
+
+:host ::ng-deep .fixed.inset-0.bg-black.bg-opacity-50 .text-gray-600,
+:host ::ng-deep .fixed.inset-0.bg-black.bg-opacity-30 .text-gray-600 {
+  color: var(--text-secondary) !important;
+}
+
+:host ::ng-deep .fixed.inset-0.bg-black.bg-opacity-50 .text-gray-500,
+:host ::ng-deep .fixed.inset-0.bg-black.bg-opacity-30 .text-gray-500 {
+  color: var(--text-tertiary) !important;
+}

@@ -91,6 +91,18 @@ export class StorageService {
     return this.getItem(environment.userKey);
   }
 
+  setUserSettings(settings: any): void {
+    this.setItem('user_settings', settings);
+  }
+
+  getUserSettings(): any {
+    return this.getItem('user_settings');
+  }
+
+  clearUserSettings(): void {
+    this.removeItem('user_settings');
+  }
+
   hasValidToken(): boolean {
     return !!this.getAccessToken();
   }

@@ -3,3 +3,79 @@
   top: -9999px;
   left: -9999px;
 }
+
+// Aplicar tema oscuro a clases de Tailwind hardcodeadas
+:host ::ng-deep .bg-gray-50 {
+  background-color: var(--bg-secondary) !important;
+}
+
+:host ::ng-deep .text-gray-800,
+:host ::ng-deep .text-gray-900 {
+  color: var(--text-primary) !important;
+}
+
+:host ::ng-deep .text-gray-600,
+:host ::ng-deep .text-gray-700 {
+  color: var(--text-secondary) !important;
+}
+
+:host ::ng-deep .text-gray-500 {
+  color: var(--text-tertiary) !important;
+}
+
+:host ::ng-deep .text-gray-400 {
+  color: var(--text-tertiary) !important;
+}
+
+:host ::ng-deep .border-gray-200,
+:host ::ng-deep .border-gray-300 {
+  border-color: var(--border-primary) !important;
+}
+
+:host ::ng-deep .bg-gray-200 {
+  background-color: var(--bg-tertiary) !important;
+}
+
+:host ::ng-deep .hover\:shadow-md:hover {
+  box-shadow: var(--shadow-md) !important;
+}
+
+:host ::ng-deep .text-error {
+  color: var(--color-error) !important;
+}
+
+:host ::ng-deep .hover\:bg-error:hover {
+  background-color: var(--color-error-bg) !important;
+}
+
+:host ::ng-deep .text-warning {
+  color: var(--color-primary) !important;
+}
+
+:host ::ng-deep .text-success {
+  color: var(--color-success) !important;
+}
+
+:host ::ng-deep .bg-success {
+  background-color: var(--color-success-bg) !important;
+}
+
+:host ::ng-deep .text-green-700 {
+  color: var(--color-success) !important;
+}
+
+:host ::ng-deep .bg-opacity-20 {
+  opacity: 0.2 !important;
+}
+
+:host ::ng-deep .bg-opacity-30 {
+  opacity: 0.3 !important;
+}
+
+:host ::ng-deep .bg-opacity-5 {
+  opacity: 0.05 !important;
+}
+
+:host ::ng-deep .hover\:bg-opacity-30:hover {
+  opacity: 0.3 !important;
+}

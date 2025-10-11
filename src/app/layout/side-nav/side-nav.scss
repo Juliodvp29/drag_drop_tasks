@@ -1,3 +1,68 @@
- :host {
-   display: block;
- }
+:host {
+  display: block;
+}
+
+// Aplicar tema al side nav
+nav {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  border-color: var(--border-primary);
+}
+
+nav .border-b {
+  border-color: var(--border-primary);
+}
+
+nav .border-t {
+  border-color: var(--border-primary);
+}
+
+// Botón móvil
+nav button.bg-white {
+  background-color: var(--bg-primary);
+  border-color: var(--border-primary);
+  color: var(--text-primary);
+}
+
+// Avatar y texto del usuario
+nav .text-gray-900 {
+  color: var(--text-primary);
+}
+
+nav .text-gray-500 {
+  color: var(--text-secondary);
+}
+
+// Enlaces del menú
+nav a {
+  color: var(--text-primary);
+  border-color: var(--border-primary);
+
+  &:hover {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+  }
+}
+
+nav a.active {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+// Submenú administración
+nav .text-gray-600 {
+  color: var(--text-secondary);
+}
+
+nav .text-gray-600:hover {
+  color: var(--text-primary);
+}
+
+// Logout button
+nav a.text-red-700 {
+  color: var(--color-error);
+}
+
+nav a.text-red-700:hover {
+  background-color: var(--color-error-bg);
+}

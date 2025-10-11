@@ -1,0 +1,100 @@
+// Variables de tema claro
+:root,
+[data-theme="light"] {
+  // Colores de fondo
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+
+  // Colores de texto
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+
+  // Colores de borde
+  --border-primary: #e5e7eb;
+  --border-secondary: #d1d5db;
+
+  // Colores de acción
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-secondary: #f3f4f6;
+  --color-secondary-hover: #e5e7eb;
+
+  // Estados
+  --color-success: #10b981;
+  --color-success-bg: #dcfce7;
+  --color-success-text: #166534;
+  --color-error: #dc2626;
+  --color-error-bg: #fef2f2;
+  --color-error-text: #dc2626;
+
+  // Sombras
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+// Variables de tema oscuro
+[data-theme="dark"] {
+  // Colores de fondo
+  --bg-primary: #1f2937;
+  --bg-secondary: #111827;
+  --bg-tertiary: #374151;
+
+  // Colores de texto
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-tertiary: #9ca3af;
+
+  // Colores de borde
+  --border-primary: #374151;
+  --border-secondary: #4b5563;
+
+  // Colores de acción
+  --color-primary: #3b82f6;
+  --color-primary-hover: #60a5fa;
+  --color-secondary: #374151;
+  --color-secondary-hover: #4b5563;
+
+  // Estados
+  --color-success: #10b981;
+  --color-success-bg: #064e3b;
+  --color-success-text: #34d399;
+  --color-error: #ef4444;
+  --color-error-bg: #7f1d1d;
+  --color-error-text: #fca5a5;
+
+  // Sombras
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+}
+
+// Aplicar colores a elementos base
+body {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+// Utilidades de tema
+.bg-primary {
+  background-color: var(--bg-primary);
+}
+
+.bg-secondary {
+  background-color: var(--bg-secondary);
+}
+
+.text-primary {
+  color: var(--text-primary);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.border-primary {
+  border-color: var(--border-primary);
+}

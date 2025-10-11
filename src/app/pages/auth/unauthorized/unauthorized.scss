@@ -1,0 +1,53 @@
+// Aplicar tema oscuro a clases de Tailwind hardcodeadas
+:host {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.min-h-screen {
+  background-color: var(--bg-secondary);
+}
+
+.bg-gray-50 {
+  background-color: var(--bg-secondary) !important;
+}
+
+.text-gray-900 {
+  color: var(--text-primary) !important;
+}
+
+.text-gray-600 {
+  color: var(--text-secondary) !important;
+}
+
+.bg-error {
+  background-color: var(--color-error) !important;
+}
+
+.text-error {
+  color: var(--color-error) !important;
+}
+
+.bg-primary {
+  background-color: var(--color-primary) !important;
+}
+
+.text-white {
+  color: white !important;
+}
+
+.hover\:bg-primary-dark:hover {
+  background-color: var(--color-primary-hover) !important;
+}
+
+.bg-gray-200 {
+  background-color: var(--bg-tertiary) !important;
+}
+
+.text-gray-700 {
+  color: var(--text-secondary) !important;
+}
+
+.hover\:bg-gray-300:hover {
+  background-color: var(--bg-secondary) !important;
+}

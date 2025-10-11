@@ -1,4 +1,5 @@
 import { ApiResponse, Role } from './auth.model';
+import { Theme } from '../../core/services/theme-service';
 
 export interface UserProfile {
   id: number;
@@ -60,7 +61,7 @@ export interface DashboardLayout {
 }
 
 export interface UserSettings {
-  theme?: string;
+  theme?: Theme;
   language?: string;
   timezone?: string;
   date_format?: string;
