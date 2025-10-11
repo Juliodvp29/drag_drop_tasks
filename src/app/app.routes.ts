@@ -33,7 +33,36 @@ export const routes: Routes = [
       { path: '', redirectTo: 'login', pathMatch: 'full' }
     ]
   },
-
+  // rutas admin
+  {
+    path: 'admin',
+    component: MainLayout,
+    canActivate: [authGuard, permissionGuard],
+    children: [
+      {
+        path: 'users',
+        loadComponent: () =>
+          import('./pages/admin/users-management/users-management')
+            .then(m => m.UsersManagement),
+        data: {
+          permissions: ['users.view'],
+          requireAll: false,
+          title: 'Gestión de Usuarios'
+        }
+      },
+      {
+        path: 'settings-profile',
+        loadComponent: () =>
+          import('./pages/admin/settings-profile/settings-profile')
+            .then(m => m.SettingsProfile),
+        data: {
+          permissions: ['profile.view'],
+          requireAll: false,
+          title: 'Configuración de Perfil'
+        }
+      }
+    ]
+  },
   // Rutas protegidas (requieren autenticación)
   {
     path: '',
