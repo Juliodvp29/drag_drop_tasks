@@ -15,6 +15,7 @@ export class Card {
   @Output() taskMoved = new EventEmitter<{ taskId: number, sourceListId: number, targetListId: number }>();
   @Output() taskDeleted = new EventEmitter<number>();
   @Output() taskCompleted = new EventEmitter<number>();
+  @Output() taskDetailOpened = new EventEmitter<ApiTask>();
 
   isDragging = signal(false);
 
@@ -120,5 +121,9 @@ export class Card {
 
   markAsCompleted(): void {
     this.taskCompleted.emit(this.task.id);
+  }
+
+  onDblClick(): void {
+    this.taskDetailOpened.emit(this.task);
   }
 }

@@ -1,8 +1,9 @@
 import { ConfirmationService } from '@/app/core/services/confirmation-service';
 import { ToastService } from '@/app/core/services/toast-service';
-import { ApiTask, ApiTaskList, TaskPriority, TaskStatus } from '@/app/shared/models/task.model';
+import { ApiTask, ApiTaskList, TaskComment, TaskPriority, TaskStatus } from '@/app/shared/models/task.model';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
+import { CommentService } from './comment-service';
 import { ListService } from './list-service';
 import { TaskApiService } from './task-api-service';
 
@@ -13,6 +14,7 @@ export class TaskService {
 
   private listApiService = inject(ListService);
   private taskApiService = inject(TaskApiService);
+  private commentService = inject(CommentService);
   private toastService = inject(ToastService);
   private confirmationService = inject(ConfirmationService);
 
@@ -334,5 +336,112 @@ export class TaskService {
    */
   getListById(listId: number): ApiTaskList | undefined {
     return this.lists().find(l => l.id === listId);
+  }
+
+  /**
+   * Obtener comentarios de una tarea
+   */
+  async getComments(taskId: number): Promise<TaskComment[]> {
+    try {
+      this.loadingSignal.set(true);
+      this.errorSignal.set(null);
+
+      const response = await firstValueFrom(
+        this.commentService.getComments(taskId)
+      );
+
+      if (response.success) {
+        console.log('API response data:', response.data);
+        // Si la API devuelve {comments: []}, usar response.data.comments
+        // Si devuelve directamente [], usar response.data
+        const data = response.data as any;
+        return Array.isArray(data) ? data : (data.comments || []);
+      }
+      return [];
+    } catch (error: any) {
+      this.errorSignal.set(error.message);
+      this.toastService.error('Error al cargar comentarios');
+      console.error('Error loading comments:', error);
+      return [];
+    } finally {
+      this.loadingSignal.set(false);
+    }
+  }
+
+  /**
+   * Agregar comentario a una tarea
+   */
+  async createComment(taskId: number, content: string): Promise<void> {
+    try {
+      this.loadingSignal.set(true);
+
+      const response = await firstValueFrom(
+        this.commentService.createComment(taskId, { content })
+      );
+
+      if (response.success) {
+        this.toastService.success('Comentario agregado exitosamente');
+      }
+    } catch (error: any) {
+      this.toastService.error(error.message || 'Error al agregar comentario');
+      console.error('Error creating comment:', error);
+      throw error;
+    } finally {
+      this.loadingSignal.set(false);
+    }
+  }
+
+  /**
+   * Editar comentario
+   */
+  async updateComment(taskId: number, commentId: number, content: string): Promise<void> {
+    try {
+      this.loadingSignal.set(true);
+
+      const response = await firstValueFrom(
+        this.commentService.updateComment(taskId, commentId, { content })
+      );
+
+      if (response.success) {
+        this.toastService.success('Comentario actualizado exitosamente');
+      }
+    } catch (error: any) {
+      this.toastService.error(error.message || 'Error al actualizar comentario');
+      console.error('Error updating comment:', error);
+      throw error;
+    } finally {
+      this.loadingSignal.set(false);
+    }
+  }
+
+  /**
+   * Eliminar comentario
+   */
+  async deleteComment(taskId: number, commentId: number): Promise<void> {
+    const confirmed = await firstValueFrom(
+      this.confirmationService.confirmDelete(
+        'este comentario',
+        '¿Estás seguro de que deseas eliminar este comentario?'
+      )
+    );
+
+    if (!confirmed) return;
+
+    try {
+      this.loadingSignal.set(true);
+
+      const response = await firstValueFrom(
+        this.commentService.deleteComment(taskId, commentId)
+      );
+
+      if (response.success) {
+        this.toastService.success('Comentario eliminado exitosamente');
+      }
+    } catch (error: any) {
+      this.toastService.error(error.message || 'Error al eliminar comentario');
+      console.error('Error deleting comment:', error);
+    } finally {
+      this.loadingSignal.set(false);
+    }
   }
 }

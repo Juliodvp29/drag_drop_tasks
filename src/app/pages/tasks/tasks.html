@@ -38,6 +38,13 @@
           </div>
         </div>
       </div>
+   
+      <!-- Panel de detalle de tarea -->
+      <app-task-detail
+        [task]="selectedTask()!"
+        [isOpen]="isDetailOpen()"
+        (closePanel)="closeTaskDetail()">
+      </app-task-detail>
     </div>
 
     <!-- Indicador de carga -->
@@ -67,7 +74,7 @@
     @if (!taskService.loading()) {
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       @for (list of taskService.lists(); track list.id) {
-      <app-list [list]="list" (taskMoved)="onTaskMoved($event)" class="h-fit" />
+      <app-list [list]="list" (taskMoved)="onTaskMoved($event)" (taskDetailOpened)="openTaskDetail($event)" class="h-fit" />
       }
     </div>
     }

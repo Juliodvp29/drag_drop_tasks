@@ -1,4 +1,4 @@
-import { ApiTaskList, TaskPriority } from '@/app/shared/models/task.model';
+import { ApiTask, ApiTaskList, TaskPriority } from '@/app/shared/models/task.model';
 import { SortTasksPipe } from '@/app/shared/pipes/sort-tasks-pipe';
 import { CommonModule } from '@angular/common';
 import { Component, computed, EventEmitter, inject, Input, Output, signal } from '@angular/core';
@@ -16,6 +16,7 @@ export class List {
 
   @Input({ required: true }) list!: ApiTaskList;
   @Output() taskMoved = new EventEmitter<{ taskId: number, sourceListId: number, targetListId: number }>();
+  @Output() taskDetailOpened = new EventEmitter<ApiTask>();
 
   taskService = inject(TaskService);
 
@@ -138,5 +139,9 @@ export class List {
 
   async onTaskCompleted(taskId: number): Promise<void> {
     await this.taskService.completeTask(taskId);
+  }
+
+  onTaskDetailOpened(task: ApiTask): void {
+    this.taskDetailOpened.emit(task);
   }
 }

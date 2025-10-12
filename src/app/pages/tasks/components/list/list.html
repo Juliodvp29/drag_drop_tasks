@@ -98,7 +98,7 @@
     <div class="p-2 space-y-2">
       @for (task of sortedTasks(); track task.id) {
       <app-card [task]="task" (taskMoved)="onTaskMoved($event)" (taskDeleted)="onTaskDeleted($event)"
-        (taskCompleted)="onTaskCompleted($event)" />
+        (taskCompleted)="onTaskCompleted($event)" (taskDetailOpened)="onTaskDetailOpened($event)" />
       }
     </div>
     }

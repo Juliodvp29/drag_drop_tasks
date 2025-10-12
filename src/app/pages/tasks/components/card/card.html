@@ -1,7 +1,7 @@
 <!-- Template del componente Card actualizado para API -->
 <div
   class="bg-gray-50 mb-3 rounded-lg p-3 border-l-4 border-gray-200 hover:shadow-md transition-all duration-200 cursor-grab active:cursor-grabbing group"
-  [class.opacity-75]="isDragging()" [ngClass]="getPriorityBorderClass()" draggable="true"
+  [class.opacity-75]="isDragging()" [ngClass]="getPriorityBorderClass()" draggable="true" (dblclick)="onDblClick()"
   (dragstart)="onDragStart($event)" (dragend)="onDragEnd($event)">
 
   <!-- Header con prioridad -->
