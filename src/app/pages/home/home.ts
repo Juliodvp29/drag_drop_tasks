@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { TaskService } from '../tasks/services/task-service';
 import { StorageService } from '@/app/core/services/storage-service';
 import { TaskPriority, TaskStatus } from '@/app/shared/models/task.model';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-home',
@@ -172,5 +173,145 @@ export class Home implements OnInit, OnDestroy {
       { label: 'Completadas', value: completed, color: '#16a34a', percentage: total > 0 ? Math.round((completed / total) * 100) : 0 },
       { label: 'Pendientes', value: pending, color: '#ea580c', percentage: total > 0 ? Math.round((pending / total) * 100) : 0 }
     ];
+  }
+
+  downloadTasksReport() {
+    const lists = this.taskService.lists();
+    const exportData: any[] = [];
+
+    // Agregar encabezado
+    exportData.push({
+      'Lista': 'REPORTE DE TAREAS',
+      'Tarea': '',
+      'Estado': '',
+      'Prioridad': '',
+      'Fecha Creación': '',
+      'Fecha Vencimiento': '',
+      'Descripción': ''
+    });
+
+    exportData.push({}); // Línea vacía
+
+    lists.forEach(list => {
+      // Agregar nombre de la lista
+      exportData.push({
+        'Lista': list.name,
+        'Tarea': '',
+        'Estado': '',
+        'Prioridad': '',
+        'Fecha Creación': '',
+        'Fecha Vencimiento': '',
+        'Descripción': ''
+      });
+
+      // Agregar tareas de la lista
+      if (list.tasks && list.tasks.length > 0) {
+        list.tasks.forEach(task => {
+          exportData.push({
+            'Lista': '',
+            'Tarea': task.title,
+            'Estado': this.getStatusText(task.status),
+            'Prioridad': this.getPriorityText(task.priority),
+            'Fecha Creación': task.created_at ? new Date(task.created_at).toLocaleDateString('es-ES') : '',
+            'Fecha Vencimiento': task.due_date ? new Date(task.due_date).toLocaleDateString('es-ES') : '',
+            'Descripción': task.description || ''
+          });
+        });
+      } else {
+        exportData.push({
+          'Lista': '',
+          'Tarea': 'No hay tareas en esta lista',
+          'Estado': '',
+          'Prioridad': '',
+          'Fecha Creación': '',
+          'Fecha Vencimiento': '',
+          'Descripción': ''
+        });
+      }
+
+      exportData.push({}); // Línea vacía entre listas
+    });
+
+    // Agregar estadísticas al final
+    exportData.push({
+      'Lista': 'ESTADÍSTICAS',
+      'Tarea': '',
+      'Estado': '',
+      'Prioridad': '',
+      'Fecha Creación': '',
+      'Fecha Vencimiento': '',
+      'Descripción': ''
+    });
+
+    exportData.push({
+      'Lista': 'Total de tareas',
+      'Tarea': this.totalTasks(),
+      'Estado': '',
+      'Prioridad': '',
+      'Fecha Creación': '',
+      'Fecha Vencimiento': '',
+      'Descripción': ''
+    });
+
+    exportData.push({
+      'Lista': 'Tareas completadas',
+      'Tarea': this.completedTasks(),
+      'Estado': '',
+      'Prioridad': '',
+      'Fecha Creación': '',
+      'Fecha Vencimiento': '',
+      'Descripción': ''
+    });
+
+    exportData.push({
+      'Lista': 'Tareas pendientes',
+      'Tarea': this.pendingTasks(),
+      'Estado': '',
+      'Prioridad': '',
+      'Fecha Creación': '',
+      'Fecha Vencimiento': '',
+      'Descripción': ''
+    });
+
+    exportData.push({
+      'Lista': 'Tareas urgentes',
+      'Tarea': this.urgentTasks(),
+      'Estado': '',
+      'Prioridad': '',
+      'Fecha Creación': '',
+      'Fecha Vencimiento': '',
+      'Descripción': ''
+    });
+
+    // Crear el libro de Excel
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Tareas');
+
+    // Generar nombre del archivo con fecha
+    const date = new Date().toISOString().split('T')[0];
+    const filename = `reporte_tareas_${date}.xlsx`;
+
+    // Descargar el archivo
+    XLSX.writeFile(wb, filename);
+  }
+
+  private getStatusText(status: TaskStatus): string {
+    switch (status) {
+      case TaskStatus.PENDING: return 'Pendiente';
+      case TaskStatus.IN_PROGRESS: return 'En Progreso';
+      case TaskStatus.COMPLETED: return 'Completada';
+      default: return 'Desconocido';
+    }
+  }
+
+  private getPriorityText(priority: TaskPriority): string {
+    switch (priority) {
+      case TaskPriority.LOW: return 'Baja';
+      case TaskPriority.MEDIUM: return 'Media';
+      case TaskPriority.HIGH: return 'Alta';
+      case TaskPriority.URGENT: return 'Urgente';
+      default: return 'Desconocida';
+    }
   }
 }
