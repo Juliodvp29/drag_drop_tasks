@@ -90,6 +90,7 @@
   align-items: center;
   gap: 1rem;
   transition: transform 0.2s, box-shadow 0.2s;
+  min-height: 110px;
 }
 
 .stat-card:hover {
@@ -98,8 +99,20 @@
 }
 
 .stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-primary-bg, #eef4ff);
   color: var(--color-primary);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
+}
+
+.stat-icon svg {
+  width: 22px;
+  height: 22px;
 }
 
 .stat-content {
@@ -110,12 +123,21 @@
   font-size: 2rem;
   font-weight: 700;
   color: var(--text-primary);
+  line-height: 1;
 }
 
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+
 .stat-label {
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   color: var(--text-secondary);
-  margin-top: 0.25rem;
 }
 
 /* Main Content Grid */

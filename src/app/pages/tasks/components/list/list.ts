@@ -1,5 +1,4 @@
 import { ApiTask, ApiTaskList, TaskPriority } from '@/app/shared/models/task.model';
-import { SortTasksPipe } from '@/app/shared/pipes/sort-tasks-pipe';
 import { CommonModule } from '@angular/common';
 import { Component, computed, EventEmitter, inject, Input, Output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -8,7 +7,7 @@ import { Card } from "../card/card";
 
 @Component({
   selector: 'app-list',
-  imports: [CommonModule, FormsModule, Card, SortTasksPipe],
+  imports: [CommonModule, FormsModule, Card],
   templateUrl: './list.html',
   styleUrl: './list.scss'
 })
