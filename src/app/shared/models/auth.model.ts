@@ -77,3 +77,26 @@ export interface ApiError {
   message: string;
   errors?: string[];
 }
+
+// Role management interfaces
+export interface CreateRoleRequest {
+  name: string;
+  display_name: string;
+  description?: string;
+  permissions: string[];
+}
+
+export interface UpdateRoleRequest {
+  display_name?: string;
+  description?: string;
+  permissions?: string[];
+  is_active?: boolean;
+}
+
+export interface Permission {
+  id: string;
+  name: string;
+  display_name: string;
+  description?: string;
+  category: string;
+}

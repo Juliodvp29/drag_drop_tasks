@@ -60,6 +60,17 @@ export const routes: Routes = [
           requireAll: false,
           title: 'Configuración de Perfil'
         }
+      },
+      {
+        path: 'roles',
+        loadComponent: () =>
+          import('./pages/admin/roles-management/roles-management')
+            .then(m => m.RolesManagement),
+        data: {
+          permissions: ['roles.view'],
+          requireAll: false,
+          title: 'Gestión de Roles'
+        }
       }
     ]
   },
