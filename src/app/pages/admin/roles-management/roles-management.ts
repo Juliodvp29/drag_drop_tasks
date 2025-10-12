@@ -19,7 +19,6 @@ export class RolesManagement implements OnInit {
   private toastService = inject(ToastService);
   private confirmationService = inject(ConfirmationService);
 
-  // Signals
   roles = signal<Role[]>([]);
   permissions = signal<Permission[]>([]);
   loading = signal(false);
@@ -27,7 +26,6 @@ export class RolesManagement implements OnInit {
   showCreateModal = signal(false);
   editingRole = signal<Role | null>(null);
 
-  // Form data
   newRole = signal<CreateRoleRequest>({
     name: '',
     display_name: '',

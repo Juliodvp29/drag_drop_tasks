@@ -1,7 +1,7 @@
 import { ConfirmationService } from '@/app/core/services/confirmation-service';
+import { CommonModule } from '@angular/common';
 import { Component, HostListener, inject } from '@angular/core';
 import { ConfirmationType } from '../../models/confirmation.model';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-confirmation',
@@ -17,23 +17,17 @@ export class Confirmation {
   config = this.confirmationService.config;
   ConfirmationType = ConfirmationType;
 
-  /**
-   * Confirmar acción
-   */
+
   onConfirm(): void {
     this.confirmationService.onConfirm();
   }
 
-  /**
-   * Cancelar acción
-   */
+
   onCancel(): void {
     this.confirmationService.onCancel();
   }
 
-  /**
-   * Cerrar con tecla Escape
-   */
+
   @HostListener('document:keydown.escape')
   onEscapeKey(): void {
     if (this.showModal()) {
@@ -41,9 +35,7 @@ export class Confirmation {
     }
   }
 
-  /**
-   * Obtener clases del modal según el tipo
-   */
+
   getModalClasses(): string {
     const type = this.config()?.type;
     const baseClasses = 'confirmation-modal';
@@ -61,9 +53,7 @@ export class Confirmation {
     }
   }
 
-  /**
-   * Obtener clase del botón de confirmar
-   */
+
   getConfirmButtonClass(): string {
     const customClass = this.config()?.confirmButtonClass;
     if (customClass) return customClass;

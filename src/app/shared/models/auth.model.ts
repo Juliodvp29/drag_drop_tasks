@@ -78,7 +78,6 @@ export interface ApiError {
   errors?: string[];
 }
 
-// Role management interfaces
 export interface CreateRoleRequest {
   name: string;
   display_name: string;

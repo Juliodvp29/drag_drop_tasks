@@ -2,16 +2,12 @@ import { ApiTask, TaskPriority, TaskStatus } from "../models/task.model";
 
 export class TaskUtils {
 
-  /**
-  * Convierte fecha ISO string a objeto Date
-  */
+
   static parseDate(dateString: string): Date {
     return new Date(dateString);
   }
 
-  /**
-   * Formatea fecha para mostrar
-   */
+
   static formatDate(dateString: string, locale: string = 'es-ES'): string {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat(locale, {
@@ -23,9 +19,7 @@ export class TaskUtils {
     }).format(date);
   }
 
-  /**
-   * Formatea fecha relativa (hace 2 horas, ayer, etc.)
-   */
+
   static formatRelativeDate(dateString: string): string {
     const date = new Date(dateString);
     const now = new Date();
@@ -42,9 +36,7 @@ export class TaskUtils {
     return this.formatDate(dateString);
   }
 
-  /**
-   * Verifica si una tarea está vencida
-   */
+
   static isTaskOverdue(task: ApiTask): boolean {
     if (!task.due_date || task.status === TaskStatus.COMPLETED) {
       return false;
@@ -52,9 +44,7 @@ export class TaskUtils {
     return new Date(task.due_date) < new Date();
   }
 
-  /**
-   * Obtiene el color según la prioridad
-   */
+
   static getPriorityColor(priority: TaskPriority): string {
     switch (priority) {
       case TaskPriority.LOW:
@@ -70,9 +60,7 @@ export class TaskUtils {
     }
   }
 
-  /**
-   * Obtiene el color según el estado
-   */
+
   static getStatusColor(status: TaskStatus): string {
     switch (status) {
       case TaskStatus.PENDING:
@@ -88,9 +76,7 @@ export class TaskUtils {
     }
   }
 
-  /**
-   * Obtiene el label traducido del estado
-   */
+
   static getStatusLabel(status: TaskStatus): string {
     switch (status) {
       case TaskStatus.PENDING:
@@ -106,9 +92,7 @@ export class TaskUtils {
     }
   }
 
-  /**
-   * Ordena tareas por prioridad y fecha
-   */
+
   static sortTasks(tasks: ApiTask[]): ApiTask[] {
     const priorityOrder = {
       [TaskPriority.URGENT]: 4,
@@ -118,18 +102,15 @@ export class TaskUtils {
     };
 
     return [...tasks].sort((a, b) => {
-      // Completadas al final
       const aCompleted = a.status === TaskStatus.COMPLETED || !!a.completed_at;
       const bCompleted = b.status === TaskStatus.COMPLETED || !!b.completed_at;
 
       if (aCompleted && !bCompleted) return 1;
       if (!aCompleted && bCompleted) return -1;
 
-      // Por prioridad
       const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority];
       if (priorityDiff !== 0) return priorityDiff;
 
-      // Por fecha de vencimiento (las más próximas primero)
       if (a.due_date && b.due_date) {
         const dueDateDiff = new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
         if (dueDateDiff !== 0) return dueDateDiff;
@@ -137,7 +118,6 @@ export class TaskUtils {
       if (a.due_date && !b.due_date) return -1;
       if (!a.due_date && b.due_date) return 1;
 
-      // Por fecha de creación (más recientes primero)
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
   }
@@ -155,30 +135,22 @@ export class TaskUtils {
     });
   }
 
-  /**
-   * Filtra tareas por estado
-   */
+
   static filterTasksByStatus(tasks: ApiTask[], status: TaskStatus): ApiTask[] {
     return tasks.filter(task => task.status === status);
   }
 
-  /**
-   * Filtra tareas por prioridad
-   */
+
   static filterTasksByPriority(tasks: ApiTask[], priority: TaskPriority): ApiTask[] {
     return tasks.filter(task => task.priority === priority);
   }
 
-  /**
-   * Filtra tareas vencidas
-   */
+
   static filterOverdueTasks(tasks: ApiTask[]): ApiTask[] {
     return tasks.filter(task => this.isTaskOverdue(task));
   }
 
-  /**
-   * Busca tareas por término
-   */
+
   static searchTasks(tasks: ApiTask[], searchTerm: string): ApiTask[] {
     const term = searchTerm.toLowerCase().trim();
     if (!term) return tasks;
@@ -190,9 +162,7 @@ export class TaskUtils {
     );
   }
 
-  /**
-   * Calcula estadísticas de tareas
-   */
+
   static getTaskStats(tasks: ApiTask[]) {
     const total = tasks.length;
     const completed = tasks.filter(t => t.status === TaskStatus.COMPLETED).length;
@@ -213,9 +183,7 @@ export class TaskUtils {
     };
   }
 
-  /**
-   * Calcula estadísticas de prioridad
-   */
+
   static getPriorityStats(tasks: ApiTask[]) {
     const activeTasks = tasks.filter(
       t => t.status !== TaskStatus.COMPLETED && t.status !== TaskStatus.CANCELLED
@@ -230,17 +198,13 @@ export class TaskUtils {
     };
   }
 
-  /**
-   * Valida una fecha de vencimiento
-   */
+
   static isValidDueDate(dueDate: string): boolean {
     const date = new Date(dueDate);
     return !isNaN(date.getTime());
   }
 
-  /**
-   * Calcula tiempo restante hasta la fecha de vencimiento
-   */
+
   static getTimeUntilDue(dueDate: string): string {
     const now = new Date();
     const due = new Date(dueDate);
@@ -260,9 +224,7 @@ export class TaskUtils {
     return `${weeks} semana${weeks > 1 ? 's' : ''}`;
   }
 
-  /**
-   * Genera un color aleatorio para una lista
-   */
+
   static getRandomColor(): string {
     const colors = [
       '#ef4444', // red
@@ -277,9 +239,7 @@ export class TaskUtils {
     return colors[Math.floor(Math.random() * colors.length)];
   }
 
-  /**
-   * Convierte tags string a array
-   */
+
   static parseTags(tagsInput: string): string[] {
     return tagsInput
       .split(',')
@@ -287,9 +247,7 @@ export class TaskUtils {
       .filter(tag => tag.length > 0);
   }
 
-  /**
-   * Convierte array de tags a string
-   */
+
   static stringifyTags(tags: string[]): string {
     return tags.join(', ');
   }

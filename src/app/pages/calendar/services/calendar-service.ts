@@ -41,9 +41,7 @@ export class CalendarService {
     });
   });
 
-  /**
-   * Obtener todos los eventos con paginación y filtros
-   */
+
   getEvents(params?: EventsQueryParams): Observable<CalendarEventsResponse> {
     this.isLoadingSignal.set(true);
 
@@ -72,9 +70,7 @@ export class CalendarService {
       );
   }
 
-  /**
-   * Obtener eventos en un rango de fechas
-   */
+
   getEventsByRange(params: EventRangeParams): Observable<CalendarEventsResponse> {
     this.isLoadingSignal.set(true);
 
@@ -87,7 +83,6 @@ export class CalendarService {
         tap(response => {
           console.log('Response from API:', response);
           if (response.success && response.data) {
-            // Verificar si data es un array o un objeto con eventos
             const eventsArray = Array.isArray(response.data) ? response.data :
               (response.data as any).events || [];
             this.eventsSignal.set(this.parseEvents(eventsArray));
@@ -101,9 +96,7 @@ export class CalendarService {
       );
   }
 
-  /**
-   * Obtener próximos eventos
-   */
+
   getUpcomingEvents(params?: UpcomingEventsParams): Observable<CalendarEventsResponse> {
     this.isLoadingSignal.set(true);
 
@@ -129,9 +122,7 @@ export class CalendarService {
       );
   }
 
-  /**
-   * Obtener días festivos de un año
-   */
+
   getHolidays(year?: number): Observable<CalendarEventsResponse> {
     const httpParams = new HttpParams().set('year', (year || new Date().getFullYear()).toString());
 
@@ -147,9 +138,7 @@ export class CalendarService {
       );
   }
 
-  /**
-   * Obtener un evento por ID
-   */
+
   getEventById(id: number): Observable<CalendarEventResponse> {
     return this.http.get<CalendarEventResponse>(`${this.API_URL}/events/${id}`)
       .pipe(
@@ -162,9 +151,7 @@ export class CalendarService {
       );
   }
 
-  /**
-   * Crear un nuevo evento
-   */
+
   createEvent(event: CreateEventRequest): Observable<CalendarEventResponse> {
     return this.http.post<CalendarEventResponse>(`${this.API_URL}/events`, event)
       .pipe(
@@ -178,9 +165,7 @@ export class CalendarService {
       );
   }
 
-  /**
-   * Actualizar un evento
-   */
+
   updateEvent(id: number, event: UpdateEventRequest): Observable<CalendarEventResponse> {
     return this.http.put<CalendarEventResponse>(`${this.API_URL}/events/${id}`, event)
       .pipe(
@@ -196,9 +181,7 @@ export class CalendarService {
       );
   }
 
-  /**
-   * Activar/desactivar un evento
-   */
+
   toggleEventStatus(id: number): Observable<CalendarEventResponse> {
     return this.http.patch<CalendarEventResponse>(`${this.API_URL}/events/${id}/status`, {})
       .pipe(
@@ -214,9 +197,7 @@ export class CalendarService {
       );
   }
 
-  /**
-   * Eliminar un evento
-   */
+
   deleteEvent(id: number): Observable<any> {
     return this.http.delete(`${this.API_URL}/events/${id}`)
       .pipe(
@@ -227,9 +208,7 @@ export class CalendarService {
       );
   }
 
-  /**
-   * Cargar eventos del mes actual
-   */
+
   loadCurrentMonthEvents(): void {
     const { month, year } = this.currentMonth();
     const startDate = new Date(year, month, 1);
@@ -241,9 +220,7 @@ export class CalendarService {
     }).subscribe();
   }
 
-  /**
-   * Cambiar mes
-   */
+
   changeMonth(direction: 'next' | 'prev'): void {
     this.currentMonthSignal.update(current => {
       let { month, year } = current;
@@ -268,17 +245,13 @@ export class CalendarService {
     this.loadCurrentMonthEvents();
   }
 
-  /**
-   * Ir a mes específico
-   */
+
   goToMonth(month: number, year: number): void {
     this.currentMonthSignal.set({ month, year });
     this.loadCurrentMonthEvents();
   }
 
-  /**
-   * Ir al mes actual
-   */
+
   goToToday(): void {
     const today = new Date();
     this.currentMonthSignal.set({
@@ -289,16 +262,12 @@ export class CalendarService {
     this.loadCurrentMonthEvents();
   }
 
-  /**
-   * Seleccionar fecha
-   */
+
   selectDate(date: Date): void {
     this.selectedDateSignal.set(date);
   }
 
-  /**
-   * Generar estructura del calendario para un mes
-   */
+
   generateCalendarMonth(): CalendarMonth {
     const { month, year } = this.currentMonth();
     const firstDay = new Date(year, month, 1);
@@ -309,14 +278,12 @@ export class CalendarService {
     const weeks: CalendarDay[][] = [];
     let currentWeek: CalendarDay[] = [];
 
-    // Días del mes anterior
     const prevMonthLastDay = new Date(year, month, 0).getDate();
     for (let i = startingDayOfWeek - 1; i >= 0; i--) {
       const date = new Date(year, month - 1, prevMonthLastDay - i);
       currentWeek.push(this.createCalendarDay(date, false));
     }
 
-    // Días del mes actual
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
       currentWeek.push(this.createCalendarDay(date, true));
@@ -327,7 +294,6 @@ export class CalendarService {
       }
     }
 
-    // Días del próximo mes
     if (currentWeek.length > 0) {
       const remainingDays = 7 - currentWeek.length;
       for (let day = 1; day <= remainingDays; day++) {
@@ -340,9 +306,7 @@ export class CalendarService {
     return { month, year, weeks };
   }
 
-  /**
-   * Crear objeto CalendarDay
-   */
+
   private createCalendarDay(date: Date, isCurrentMonth: boolean): CalendarDay {
     const today = new Date();
     const dayEvents = this.eventsSignal().filter(event => {
@@ -362,25 +326,19 @@ export class CalendarService {
     };
   }
 
-  /**
-   * Verificar si dos fechas son el mismo día
-   */
+
   private isSameDay(date1: Date, date2: Date): boolean {
     return date1.getDate() === date2.getDate() &&
       date1.getMonth() === date2.getMonth() &&
       date1.getFullYear() === date2.getFullYear();
   }
 
-  /**
-   * Parsear eventos (convertir strings a Date)
-   */
+
   private parseEvents(events: any[]): CalendarEvent[] {
     return events.map(event => this.parseEvent(event));
   }
 
-  /**
-   * Parsear un evento
-   */
+
   private parseEvent(event: any): CalendarEvent {
     return {
       ...event,
@@ -394,9 +352,7 @@ export class CalendarService {
     };
   }
 
-  /**
-   * Mezclar eventos nuevos con los existentes
-   */
+
   private mergeEvents(newEvents: CalendarEvent[]): void {
     this.eventsSignal.update(currentEvents => {
       const merged = [...currentEvents];
@@ -414,9 +370,7 @@ export class CalendarService {
     });
   }
 
-  /**
-   * Formatear fecha a YYYY-MM-DD
-   */
+
   private formatDate(date: Date): string {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -424,9 +378,7 @@ export class CalendarService {
     return `${year}-${month}-${day}`;
   }
 
-  /**
-   * Manejar errores
-   */
+
   private handleError(error: any): Observable<never> {
     console.error('Error en CalendarService:', error);
     return throwError(() => error);

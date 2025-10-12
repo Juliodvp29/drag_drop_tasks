@@ -6,13 +6,11 @@ export const permissionGuard: CanActivateFn = (route: ActivatedRouteSnapshot) =>
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  // Verificar si está autenticado
   if (!authService.isAuthenticated()) {
     router.navigate(['/auth/login']);
     return false;
   }
 
-  // Obtener permisos requeridos de la ruta
   const requiredPermissions = route.data['permissions'] as string[];
   const requireAll = route.data['requireAll'] as boolean || false;
 
@@ -20,7 +18,6 @@ export const permissionGuard: CanActivateFn = (route: ActivatedRouteSnapshot) =>
     return true;
   }
 
-  // Verificar permisos
   const hasPermission = requireAll
     ? authService.hasAllPermissions(requiredPermissions)
     : authService.hasAnyPermission(requiredPermissions);

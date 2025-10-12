@@ -1,4 +1,5 @@
 import { AuthService } from '@/app/core/services/auth-service';
+import { LayoutService } from '@/app/core/services/layout-service';
 import { ToastService } from '@/app/core/services/toast-service';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
@@ -14,13 +15,14 @@ export class SideNav implements OnInit {
 
 
   private authService = inject(AuthService);
+  private layoutService = inject(LayoutService);
   private toastService = inject(ToastService);
   private router = inject(Router);
 
   isMobileOpen = signal(false);
   showUserMenu = signal(false);
   showAdminMenu = signal(false);
-  isCollapsed = signal(false);
+  isCollapsed = this.layoutService.isCollapsed;
 
   public currentUser = this.authService.currentUser;
   userInitials = computed(() => {
@@ -45,7 +47,7 @@ export class SideNav implements OnInit {
   }
 
   toggleCollapse(): void {
-    this.isCollapsed.update(value => !value);
+    this.layoutService.toggleCollapse();
   }
 
   logout(): void {

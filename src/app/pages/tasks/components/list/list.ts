@@ -25,7 +25,6 @@ export class List {
   showOptions = signal(false);
   showDescriptionInput = signal(false);
 
-  // Computed para las estadísticas de prioridad
   priorityStats = computed(() => {
     const tasks = this.list.tasks || [];
     const activeTasks = tasks.filter(task => task.status !== 'completed' && !task.completed_at);
@@ -40,23 +39,19 @@ export class List {
     };
   });
 
-  // Computed para ordenar tareas
   sortedTasks = computed(() => {
     const tasks = this.list.tasks || [];
     return [...tasks].sort((a, b) => {
-      // Completadas al final
       const aCompleted = a.status === 'completed' || !!a.completed_at;
       const bCompleted = b.status === 'completed' || !!b.completed_at;
 
       if (aCompleted && !bCompleted) return 1;
       if (!aCompleted && bCompleted) return -1;
 
-      // Ordenar por prioridad
       const priorityOrder = { urgent: 4, high: 3, medium: 2, low: 1 };
       const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority];
       if (priorityDiff !== 0) return priorityDiff;
 
-      // Por fecha de creación
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
   });
@@ -74,7 +69,6 @@ export class List {
       description
     );
 
-    // Limpiar formulario
     this.newTaskTitle.set('');
     this.newTaskDescription.set('');
     this.selectedTaskPriority.set(TaskPriority.MEDIUM);
@@ -101,7 +95,6 @@ export class List {
     }).format(date);
   }
 
-  // Drag and Drop handlers
   onDragOver(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();

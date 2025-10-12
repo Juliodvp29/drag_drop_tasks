@@ -1,46 +1,32 @@
 import { UserListItem, UserProfile } from '../models/user-management.model';
 
-/**
- * Utilidades para trabajar con usuarios
- */
 export class UserUtils {
 
-  /**
-   * Obtiene el nombre completo del usuario
-   */
+
   static getFullName(user: UserProfile | UserListItem): string {
     return `${user.first_name} ${user.last_name}`.trim();
   }
 
-  /**
-   * Obtiene las iniciales del usuario
-   */
+
   static getInitials(user: UserProfile | UserListItem): string {
     const firstInitial = user.first_name.charAt(0).toUpperCase();
     const lastInitial = user.last_name.charAt(0).toUpperCase();
     return `${firstInitial}${lastInitial}`;
   }
 
-  /**
-   * Valida si un email es válido
-   */
+
   static isValidEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
 
-  /**
-   * Valida si una contraseña cumple los requisitos
-   */
+
   static isValidPassword(password: string): boolean {
-    // Mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
     return passwordRegex.test(password);
   }
 
-  /**
-   * Obtiene los requisitos de contraseña no cumplidos
-   */
+
   static getPasswordErrors(password: string): string[] {
     const errors: string[] = [];
 
@@ -60,9 +46,7 @@ export class UserUtils {
     return errors;
   }
 
-  /**
-   * Genera un color de fondo basado en el nombre
-   */
+
   static getAvatarColor(name: string): string {
     const colors = [
       '#ef4444', // red

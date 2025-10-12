@@ -12,7 +12,6 @@
   } @else if (currentUser()) {
   <div class="content-grid">
 
-    <!-- Información del Perfil -->
     <div class="profile-card">
       <div class="card-header">
         <h2>Información Personal</h2>
@@ -36,7 +35,6 @@
 
       <div class="card-body">
         @if (!isEditing()) {
-        <!-- Vista de solo lectura -->
         <div class="profile-info">
           <div class="avatar-section">
             @if (currentUser()?.profile_picture) {
@@ -79,7 +77,6 @@
           </div>
         </div>
         } @else {
-        <!-- Formulario de edición -->
         <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="edit-form">
           <div class="form-grid">
             <div class="form-group">
@@ -121,7 +118,6 @@
       </div>
     </div>
 
-    <!-- Configuraciones -->
     <div class="settings-card">
       <div class="card-header">
         <h2>Configuraciones</h2>

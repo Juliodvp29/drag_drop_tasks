@@ -1,9 +1,7 @@
 <div class="min-h-screen bg-soft flex">
-  <!-- menú lateral -->
   <app-side-nav class="hidden md:block fixed top-0 left-0 h-full w-64 z-50"></app-side-nav>
 
-  <!-- contenido -->
-  <main class="flex-1 md:ml-64 pt-20 md:pt-0 transition-all duration-300">
+  <main [class]="getMainClasses()">
     <app-loader></app-loader>
     <router-outlet></router-outlet>
     <app-toast />

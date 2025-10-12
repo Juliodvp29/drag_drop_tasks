@@ -26,41 +26,33 @@ export class UsersManagement {
   private confirmationService = inject(ConfirmationService);
   private authService = inject(AuthService);
 
-  // Signals para el estado
   users = signal<UserListItem[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);
 
-  // Paginación
   currentPage = signal(1);
   pageSize = signal(10);
   totalItems = signal(0);
   totalPages = computed(() => Math.ceil(this.totalItems() / this.pageSize()));
 
-  // Filtros
   filters = signal<UserFilters>({
     search: '',
     role_id: null,
     is_active: null
   });
 
-  // Ordenamiento
   sortBy = signal('id');
   sortOrder = signal<'ASC' | 'DESC'>('DESC');
 
-  // Modal
   modalState = signal<UserModalState>({
     isOpen: false,
     mode: 'create'
   });
 
-  // Roles disponibles
   availableRoles = signal<Role[]>([]);
 
-  // Usuario actual para verificar permisos
   currentUser = this.authService.currentUser;
 
-  // Exponer Math para el template
   Math = Math;
 
   ngOnInit(): void {
@@ -68,9 +60,7 @@ export class UsersManagement {
     this.loadRoles();
   }
 
-  /**
-   * Cargar usuarios con filtros actuales
-   */
+
   async loadUsers(): Promise<void> {
     try {
       this.loading.set(true);
@@ -107,9 +97,7 @@ export class UsersManagement {
     }
   }
 
-  /**
-   * Cargar roles disponibles
-   */
+
   async loadRoles(): Promise<void> {
     try {
       const response = await firstValueFrom(this.roleService.getRoles());
@@ -118,7 +106,6 @@ export class UsersManagement {
       }
     } catch (error: any) {
       console.error('Error loading roles:', error);
-      // Si falla, usar el rol del usuario actual como fallback
       const user = this.currentUser();
       if (user?.role) {
         this.availableRoles.set([user.role]);
@@ -126,17 +113,13 @@ export class UsersManagement {
     }
   }
 
-  /**
-   * Aplicar filtros
-   */
+
   applyFilters(): void {
     this.currentPage.set(1);
     this.loadUsers();
   }
 
-  /**
-   * Limpiar filtros
-   */
+
   clearFilters(): void {
     this.filters.set({
       search: '',
@@ -147,9 +130,7 @@ export class UsersManagement {
     this.loadUsers();
   }
 
-  /**
-   * Cambiar ordenamiento
-   */
+
   changeSort(field: string): void {
     if (this.sortBy() === field) {
       this.sortOrder.set(this.sortOrder() === 'ASC' ? 'DESC' : 'ASC');
@@ -160,18 +141,14 @@ export class UsersManagement {
     this.loadUsers();
   }
 
-  /**
-   * Cambiar página
-   */
+
   changePage(page: number): void {
     if (page < 1 || page > this.totalPages()) return;
     this.currentPage.set(page);
     this.loadUsers();
   }
 
-  /**
-   * Abrir modal para crear usuario
-   */
+
   openCreateModal(): void {
     this.modalState.set({
       isOpen: true,
@@ -179,9 +156,7 @@ export class UsersManagement {
     });
   }
 
-  /**
-   * Abrir modal para editar usuario
-   */
+
   openEditModal(user: UserListItem): void {
     this.modalState.set({
       isOpen: true,
@@ -190,9 +165,7 @@ export class UsersManagement {
     });
   }
 
-  /**
-   * Cerrar modal
-   */
+
   closeModal(): void {
     this.modalState.set({
       isOpen: false,
@@ -200,9 +173,7 @@ export class UsersManagement {
     });
   }
 
-  /**
-   * Guardar usuario (crear o actualizar)
-   */
+
   async onSaveUser(userData: any): Promise<void> {
     const mode = this.modalState().mode;
 
@@ -229,9 +200,7 @@ export class UsersManagement {
     }
   }
 
-  /**
-   * Activar/desactivar usuario
-   */
+
   async toggleUserStatus(user: UserListItem): Promise<void> {
     const action = user.is_active ? 'desactivar' : 'activar';
     const confirmed = await firstValueFrom(
@@ -256,9 +225,7 @@ export class UsersManagement {
     }
   }
 
-  /**
-   * Eliminar usuario
-   */
+
   async deleteUser(user: UserListItem): Promise<void> {
     const confirmed = await firstValueFrom(
       this.confirmationService.confirmDelete(
@@ -282,9 +249,7 @@ export class UsersManagement {
     }
   }
 
-  /**
-   * Formatear fecha
-   */
+
   formatDate(dateString: string): string {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('es-ES', {
@@ -296,9 +261,6 @@ export class UsersManagement {
     }).format(date);
   }
 
-  /**
-   * Obtener rango de páginas para paginación
-   */
   getPageRange(): number[] {
     const total = this.totalPages();
     const current = this.currentPage();
@@ -310,10 +272,10 @@ export class UsersManagement {
     }
 
     if (current - delta > 2) {
-      range.unshift(-1); // Separador
+      range.unshift(-1);
     }
     if (current + delta < total - 1) {
-      range.push(-1); // Separador
+      range.push(-1);
     }
 
     range.unshift(1);

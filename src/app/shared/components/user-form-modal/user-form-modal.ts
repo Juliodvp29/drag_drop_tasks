@@ -19,7 +19,6 @@ export class UserFormModal {
   @Output() save = new EventEmitter<CreateUserRequest | UpdateUserRequest>();
   @Output() cancel = new EventEmitter<void>();
 
-  // Formulario
   formData = signal({
     email: '',
     password: '',
@@ -30,7 +29,6 @@ export class UserFormModal {
     profile_picture: ''
   });
 
-  // Validación
   errors = signal<Record<string, string>>({});
   showPassword = signal(false);
   showConfirmPassword = signal(false);
@@ -47,7 +45,6 @@ export class UserFormModal {
         profile_picture: this.user.profile_picture || ''
       });
     } else if (this.availableRoles.length > 0) {
-      // Preseleccionar el primer rol disponible
       this.formData.update(data => ({
         ...data,
         role_id: this.availableRoles[0].id
@@ -55,21 +52,17 @@ export class UserFormModal {
     }
   }
 
-  /**
-   * Validar formulario
-   */
+
   validateForm(): boolean {
     const newErrors: Record<string, string> = {};
     const data = this.formData();
 
-    // Email
     if (!data.email) {
       newErrors['email'] = 'El email es requerido';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
       newErrors['email'] = 'El email no es válido';
     }
 
-    // Contraseña (solo en modo crear)
     if (this.mode === 'create') {
       if (!data.password) {
         newErrors['password'] = 'La contraseña es requerida';
@@ -84,17 +77,14 @@ export class UserFormModal {
       }
     }
 
-    // Nombre
     if (!data.first_name) {
       newErrors['first_name'] = 'El nombre es requerido';
     }
 
-    // Apellido
     if (!data.last_name) {
       newErrors['last_name'] = 'El apellido es requerido';
     }
 
-    // Rol
     if (!data.role_id) {
       newErrors['role_id'] = 'El rol es requerido';
     }
@@ -103,9 +93,6 @@ export class UserFormModal {
     return Object.keys(newErrors).length === 0;
   }
 
-  /**
-   * Guardar usuario
-   */
   onSubmit(): void {
     if (!this.validateForm()) {
       return;
@@ -134,16 +121,12 @@ export class UserFormModal {
     }
   }
 
-  /**
-   * Cancelar
-   */
+
   onCancel(): void {
     this.cancel.emit();
   }
 
-  /**
-   * Toggle mostrar contraseña
-   */
+
   toggleShowPassword(): void {
     this.showPassword.set(!this.showPassword());
   }
@@ -152,16 +135,13 @@ export class UserFormModal {
     this.showConfirmPassword.set(!this.showConfirmPassword());
   }
 
-  /**
-   * Actualizar campo del formulario
-   */
+
   updateField(field: string, value: any): void {
     this.formData.update(data => ({
       ...data,
       [field]: value
     }));
 
-    // Limpiar error del campo al escribir
     if (this.errors()[field]) {
       this.errors.update(errors => {
         const newErrors = { ...errors };

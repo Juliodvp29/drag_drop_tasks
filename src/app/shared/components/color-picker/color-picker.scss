@@ -26,7 +26,6 @@
   animation-duration: 200ms;
 }
 
-// Aplicar tema oscuro a clases de Tailwind hardcodeadas
 :host ::ng-deep .bg-white {
   background-color: var(--bg-primary) !important;
 }

@@ -1,33 +1,22 @@
-<!-- src/app/shared/components/toast/toast.component.html -->
-
-<!-- Contenedor principal de toasts (posición fija arriba a la derecha) -->
 <div class="toast-container">
 
-  <!-- Iteración sobre cada toast activo -->
   @for (toast of toasts(); track toast.id) {
 
-  <!-- Toast individual con clases dinámicas según el tipo -->
   <div [class]="getToastClasses(toast.type)">
 
-    <!-- Contenido del toast -->
     <div class="toast-content">
 
-      <!-- Icono circular de la izquierda -->
       <div class="toast-icon">
         {{ getIcon(toast.type) }}
       </div>
 
-      <!-- Texto principal (título + mensaje) -->
       <div class="toast-text">
-        <!-- Título (opcional) -->
         @if (toast.title) {
         <div class="toast-title">{{ toast.title }}</div>
         }
-        <!-- Mensaje -->
         <div class="toast-message">{{ toast.message }}</div>
       </div>
 
-      <!-- Botón cerrar (X) -->
       @if (toast.dismissible) {
       <button class="toast-close" (click)="dismiss(toast.id)" type="button" aria-label="Cerrar notificación">
         ✕
@@ -36,7 +25,6 @@
 
     </div>
 
-    <!-- Barra de progreso inferior (indica tiempo restante) -->
     <div class="toast-progress" [style.--duration]="toast.duration + 'ms'">
     </div>
 

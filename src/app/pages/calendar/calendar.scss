@@ -305,7 +305,6 @@ input[type="checkbox"] {
   }
 }
 
-// Aplicar tema oscuro a clases de Tailwind hardcodeadas
 :host {
   background-color: var(--bg-secondary) !important;
   color: var(--text-primary) !important;
@@ -315,7 +314,6 @@ input[type="checkbox"] {
   background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%) !important;
 }
 
-// Sobrescribir gradientes de Tailwind
 :host ::ng-deep .bg-gradient-to-br {
   background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%) !important;
 }
@@ -444,7 +442,6 @@ input[type="checkbox"] {
   border-color: var(--color-primary) !important;
 }
 
-// Sobrescribir clases específicas del calendario
 :host ::ng-deep .bg-white.rounded-2xl.shadow-lg {
   background-color: var(--bg-primary) !important;
   color: var(--text-primary) !important;

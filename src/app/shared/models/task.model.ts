@@ -84,7 +84,6 @@ export interface TaskQueryParams {
   overdue?: boolean;
 }
 
-// Interfaces para List
 export interface ApiTaskList {
   id: number;
   name: string;
@@ -123,7 +122,6 @@ export interface ListQueryParams {
   include_tasks?: boolean;
 }
 
-// Interfaces para Comments
 export interface TaskComment {
   id: number;
   task_id: number;
@@ -147,7 +145,6 @@ export interface UpdateCommentRequest {
   content: string;
 }
 
-// Response types
 export type TaskResponse = ApiResponse<ApiTask>;
 export type TasksResponse = ApiResponse<ApiTask[]>;
 export type ListResponse = ApiResponse<ApiTaskList>;

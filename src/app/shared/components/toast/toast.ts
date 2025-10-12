@@ -1,7 +1,7 @@
-import { Component, inject } from '@angular/core';
-import { ToastType } from '../../models/toast.model';
 import { ToastService } from '@/app/core/services/toast-service';
 import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
+import { ToastType } from '../../models/toast.model';
 
 @Component({
   selector: 'app-toast',
@@ -15,16 +15,11 @@ export class Toast {
   toasts = this.toastService.toasts;
   ToastType = ToastType;
 
-  /**
-   * Cerrar un toast específico
-   */
+
   dismiss(id: string): void {
     this.toastService.dismiss(id);
   }
 
-  /**
-   * Obtener el icono según el tipo de toast
-   */
   getIcon(type: ToastType): string {
     switch (type) {
       case ToastType.SUCCESS:
@@ -40,9 +35,7 @@ export class Toast {
     }
   }
 
-  /**
-   * Obtener las clases CSS según el tipo de toast
-   */
+
   getToastClasses(type: ToastType): string {
     const baseClasses = 'toast-item';
     switch (type) {

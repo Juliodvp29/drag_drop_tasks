@@ -25,24 +25,27 @@ export class SettingsProfile implements OnInit {
   private toastService = inject(ToastService);
   private loaderService = inject(LoaderService);
 
-  // Estado
   currentUser = signal<User | null>(null);
   userSettings = signal<UserSettings | null>(null);
   isEditing = signal(false);
   isLoading = signal(false);
 
-  // Formularios
   profileForm!: FormGroup;
   settingsForm!: FormGroup;
 
   ngOnInit(): void {
     this.initializeForms();
     this.loadUserData();
+
+    // Forzar actualización del formulario cuando cambie el tema
+    this.settingsForm.get('theme')?.valueChanges.subscribe(value => {
+      if (value) {
+        this.themeService.setTheme(value);
+      }
+    });
   }
 
-  /**
-   * Inicializar formularios
-   */
+
   private initializeForms(): void {
     this.profileForm = this.fb.group({
       first_name: ['', [Validators.required, Validators.minLength(2)]],
@@ -66,13 +69,10 @@ export class SettingsProfile implements OnInit {
     });
   }
 
-  /**
-   * Cargar datos del usuario
-   */
+
   private loadUserData(): void {
     this.isLoading.set(true);
 
-    // Obtener usuario actual
     const user = this.authService.currentUser();
     if (user) {
       this.currentUser.set(user);
@@ -83,56 +83,47 @@ export class SettingsProfile implements OnInit {
       });
     }
 
-    // Cargar configuraciones del usuario desde localStorage primero
     const storedSettings = this.storageService.getUserSettings();
     if (storedSettings) {
       this.userSettings.set(storedSettings);
       this.settingsForm.patchValue(storedSettings);
-      // Sincronizar tema con ThemeService
       if (storedSettings.theme) {
         this.themeService.loadFromUserSettings(storedSettings.theme);
       }
     }
 
-    // Luego cargar desde API para asegurar datos actualizados
     if (user?.id) {
       this.userManagementService.getUserSettings(user.id).subscribe({
         next: (response) => {
           if (response.success && response.data.settings) {
             this.userSettings.set(response.data.settings);
             this.settingsForm.patchValue(response.data.settings);
-            // Actualizar localStorage con datos frescos
             this.storageService.setUserSettings(response.data.settings);
-            // Sincronizar tema con ThemeService
             if (response.data.settings.theme) {
               this.themeService.loadFromUserSettings(response.data.settings.theme);
             }
           }
+          this.isLoading.set(false);
         },
         error: (error) => {
           console.error('Error loading user settings:', error);
-          // No mostrar error si no hay configuraciones
+          this.isLoading.set(false);
         }
       });
+    } else {
+      this.isLoading.set(false);
     }
-
-    this.isLoading.set(false);
   }
 
-  /**
-   * Toggle modo edición
-   */
+
   toggleEdit(): void {
     this.isEditing.set(!this.isEditing());
     if (!this.isEditing()) {
-      // Resetear formulario si se cancela
       this.loadUserData();
     }
   }
 
-  /**
-   * Guardar cambios del perfil
-   */
+
   saveProfile(): void {
     if (this.profileForm.invalid) {
       this.markFormGroupTouched(this.profileForm);
@@ -155,7 +146,7 @@ export class SettingsProfile implements OnInit {
       next: (response) => {
         if (response.success) {
           this.toastService.success('Perfil actualizado correctamente');
-          this.authService.me().subscribe(); // Refrescar datos del usuario
+          this.authService.me().subscribe();
           this.isEditing.set(false);
         } else {
           this.toastService.error('Error al actualizar el perfil');
@@ -171,9 +162,7 @@ export class SettingsProfile implements OnInit {
     });
   }
 
-  /**
-   * Guardar configuraciones
-   */
+
   saveSettings(): void {
     if (this.settingsForm.invalid) {
       this.markFormGroupTouched(this.settingsForm);
@@ -191,9 +180,7 @@ export class SettingsProfile implements OnInit {
         if (response.success) {
           this.toastService.success('Configuraciones guardadas correctamente');
           this.userSettings.set(settings);
-          // Actualizar localStorage con los nuevos settings
           this.storageService.setUserSettings(settings);
-          // Sincronizar tema con ThemeService
           if (settings.theme) {
             this.themeService.setTheme(settings.theme);
           }
@@ -211,9 +198,7 @@ export class SettingsProfile implements OnInit {
     });
   }
 
-  /**
-   * Marcar todos los campos del formulario como tocados
-   */
+
   private markFormGroupTouched(formGroup: FormGroup): void {
     Object.keys(formGroup.controls).forEach(key => {
       const control = formGroup.get(key);
@@ -224,17 +209,13 @@ export class SettingsProfile implements OnInit {
     });
   }
 
-  /**
-   * Verificar si un campo tiene error
-   */
+
   hasError(formGroup: FormGroup, fieldName: string): boolean {
     const field = formGroup.get(fieldName);
     return !!(field && field.invalid && field.touched);
   }
 
-  /**
-   * Obtener mensaje de error de un campo
-   */
+
   getErrorMessage(formGroup: FormGroup, fieldName: string): string {
     const field = formGroup.get(fieldName);
     if (!field || !field.errors || !field.touched) return '';

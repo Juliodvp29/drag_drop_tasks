@@ -1,10 +1,10 @@
-import { Component, inject, OnInit, OnDestroy, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { TaskService } from '../tasks/services/task-service';
 import { StorageService } from '@/app/core/services/storage-service';
 import { TaskPriority, TaskStatus } from '@/app/shared/models/task.model';
+import { CommonModule } from '@angular/common';
+import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import * as XLSX from 'xlsx';
+import { TaskService } from '../tasks/services/task-service';
 
 @Component({
   selector: 'app-home',
@@ -16,21 +16,17 @@ export class Home implements OnInit, OnDestroy {
   private taskService = inject(TaskService);
   private storageService = inject(StorageService);
 
-  // Señales para el tiempo
   currentTime = signal(new Date());
   currentTimeString = signal('');
   currentDateString = signal('');
   greeting = signal('');
 
-  // Intervalo para actualizar el reloj
   private timeInterval?: number;
 
-  // Configuración del usuario
   userSettings = computed(() => this.storageService.getUserSettings() || {});
   timezone = computed(() => this.userSettings().timezone || 'America/Bogota');
   timeFormat = computed(() => this.userSettings().time_format || '24h');
 
-  // Estadísticas de tareas
   totalTasks = computed(() => {
     const lists = this.taskService.lists();
     return lists.reduce((total, list) => total + (list.tasks?.length || 0), 0);
@@ -73,13 +69,10 @@ export class Home implements OnInit, OnDestroy {
     }, 0);
   });
 
-  // Estadísticas de listas
   totalLists = computed(() => this.taskService.lists().length);
 
-  // Usuario actual
   currentUser = computed(() => this.storageService.getUser());
 
-  // Progreso general
   completionPercentage = computed(() => {
     const total = this.totalTasks();
     if (total === 0) return 0;
@@ -100,7 +93,6 @@ export class Home implements OnInit, OnDestroy {
   private updateTime() {
     const now = new Date();
 
-    // Actualizar saludo basado en la hora
     const hour = now.getHours();
     if (hour < 12) {
       this.greeting.set('Buenos días');
@@ -110,7 +102,6 @@ export class Home implements OnInit, OnDestroy {
       this.greeting.set('Buenas noches');
     }
 
-    // Formatear fecha
     const options: Intl.DateTimeFormatOptions = {
       weekday: 'long',
       year: 'numeric',
@@ -120,7 +111,6 @@ export class Home implements OnInit, OnDestroy {
     };
     this.currentDateString.set(now.toLocaleDateString('es-ES', options));
 
-    // Formatear hora
     const timeOptions: Intl.DateTimeFormatOptions = {
       hour: '2-digit',
       minute: '2-digit',
@@ -131,7 +121,6 @@ export class Home implements OnInit, OnDestroy {
     this.currentTimeString.set(now.toLocaleTimeString('es-ES', timeOptions));
   }
 
-  // Métodos para gráficas
   getPriorityChartData() {
     return [
       { label: 'Urgente', value: this.urgentTasks(), color: '#dc2626', percentage: this.getPriorityPercentage(TaskPriority.URGENT) },
@@ -179,7 +168,6 @@ export class Home implements OnInit, OnDestroy {
     const lists = this.taskService.lists();
     const exportData: any[] = [];
 
-    // Agregar encabezado
     exportData.push({
       'Lista': 'REPORTE DE TAREAS',
       'Tarea': '',
@@ -190,10 +178,9 @@ export class Home implements OnInit, OnDestroy {
       'Descripción': ''
     });
 
-    exportData.push({}); // Línea vacía
+    exportData.push({});
 
     lists.forEach(list => {
-      // Agregar nombre de la lista
       exportData.push({
         'Lista': list.name,
         'Tarea': '',
@@ -204,7 +191,6 @@ export class Home implements OnInit, OnDestroy {
         'Descripción': ''
       });
 
-      // Agregar tareas de la lista
       if (list.tasks && list.tasks.length > 0) {
         list.tasks.forEach(task => {
           exportData.push({
@@ -229,10 +215,9 @@ export class Home implements OnInit, OnDestroy {
         });
       }
 
-      exportData.push({}); // Línea vacía entre listas
+      exportData.push({});
     });
 
-    // Agregar estadísticas al final
     exportData.push({
       'Lista': 'ESTADÍSTICAS',
       'Tarea': '',
@@ -283,16 +268,13 @@ export class Home implements OnInit, OnDestroy {
       'Descripción': ''
     });
 
-    // Crear el libro de Excel
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Tareas');
 
-    // Generar nombre del archivo con fecha
     const date = new Date().toISOString().split('T')[0];
     const filename = `reporte_tareas_${date}.xlsx`;
 
-    // Descargar el archivo
     XLSX.writeFile(wb, filename);
   }
 

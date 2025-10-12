@@ -1,12 +1,11 @@
+import { UserManagementService } from '@/app/pages/admin/service/user-management-service';
 import { ApiResponse, LoginRequest, LoginResponse, RefreshTokenResponse, RegisterRequest, User } from '@/app/shared/models/auth.model';
-import { UserSettings } from '@/app/shared/models/user-management.model';
 import { environment } from '@/environments/environment';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, Observable, tap, throwError } from 'rxjs';
 import { StorageService } from './storage-service';
-import { UserManagementService } from '@/app/pages/admin/service/user-management-service';
 
 @Injectable({
   providedIn: 'root'
@@ -47,9 +46,7 @@ export class AuthService {
     }
   }
 
-  /**
-   * Iniciar sesión
-   */
+
   login(credentials: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.API_URL}/auth/login`, {
       ...credentials,
@@ -64,9 +61,7 @@ export class AuthService {
     );
   }
 
-  /**
-   * Registrar nuevo usuario
-   */
+
   register(data: RegisterRequest): Observable<ApiResponse<{ user: User }>> {
     return this.http.post<ApiResponse<{ user: User }>>(
       `${this.API_URL}/auth/register`,
@@ -76,9 +71,7 @@ export class AuthService {
     );
   }
 
-  /**
-   * Refrescar token de acceso
-   */
+
   refreshAccessToken(): Observable<RefreshTokenResponse> {
     const refreshToken = this.storageService.getRefreshToken();
 
@@ -102,23 +95,18 @@ export class AuthService {
     );
   }
 
-  /**
-   * Cerrar sesión
-   */
+
   logout(): Observable<any> {
     return this.http.post(`${this.API_URL}/auth/logout`, {}).pipe(
       tap(() => this.clearAuthData()),
       catchError((error) => {
-        // Incluso si falla la petición, limpiamos los datos locales
         this.clearAuthData();
         return throwError(() => error);
       })
     );
   }
 
-  /**
-   * Obtener información del usuario actual
-   */
+
   me(): Observable<ApiResponse<User>> {
     return this.http.get<ApiResponse<User>>(`${this.API_URL}/auth/me`).pipe(
       tap(response => {
@@ -131,9 +119,7 @@ export class AuthService {
     );
   }
 
-  /**
-   * Verificar si el token es válido
-   */
+
   verifyToken(): Observable<ApiResponse<{ valid: boolean; user: User }>> {
     return this.http.post<ApiResponse<{ valid: boolean; user: User }>>(
       `${this.API_URL}/auth/verify-token`,
@@ -149,9 +135,7 @@ export class AuthService {
     );
   }
 
-  /**
-   * Solicitar código de recuperación de contraseña
-   */
+
   forgotPassword(email: string): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(
       `${this.API_URL}/auth/forgot-password`,
@@ -161,9 +145,7 @@ export class AuthService {
     );
   }
 
-  /**
-   * Restablecer contraseña con código
-   */
+
   resetPassword(email: string, code: string, newPassword: string): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(
       `${this.API_URL}/auth/reset-password`,
@@ -177,39 +159,28 @@ export class AuthService {
     );
   }
 
-  /**
-   * Verificar si el usuario tiene un permiso específico
-   */
+
   hasPermission(permission: string): boolean {
     const permissions = this.userPermissions();
     return permissions.includes('*') || permissions.includes(permission);
   }
 
-  /**
-   * Verificar si el usuario tiene alguno de los permisos dados
-   */
+
   hasAnyPermission(permissions: string[]): boolean {
     return permissions.some(permission => this.hasPermission(permission));
   }
 
-  /**
-   * Verificar si el usuario tiene todos los permisos dados
-   */
   hasAllPermissions(permissions: string[]): boolean {
     return permissions.every(permission => this.hasPermission(permission));
   }
 
-  /**
-   * Verificar si el usuario tiene un rol específico
-   */
+
   hasRole(roleName: string): boolean {
     const role = this.userRole();
     return role?.name === roleName;
   }
 
-  /**
-   * Obtener información del dispositivo
-   */
+
   private getDeviceInfo(): string {
     const userAgent = navigator.userAgent;
     let browserName = 'Unknown';
@@ -228,9 +199,6 @@ export class AuthService {
     return `${browserName} on ${platform}`;
   }
 
-  /**
-   * Manejar autenticación exitosa
-   */
   private handleAuthSuccess(data: {
     user: User;
     access_token: string;
@@ -242,7 +210,6 @@ export class AuthService {
     this.currentUserSignal.set(data.user);
     this.isAuthenticatedSignal.set(true);
 
-    // Obtener y guardar configuraciones del usuario
     if (data.user.id) {
       this.userManagementService.getUserSettings(data.user.id).subscribe({
         next: (response) => {
@@ -252,15 +219,12 @@ export class AuthService {
         },
         error: (error) => {
           console.warn('No se pudieron cargar las configuraciones del usuario:', error);
-          // No es crítico, continuar sin settings
         }
       });
     }
   }
 
-  /**
-   * Limpiar datos de autenticación
-   */
+
   private clearAuthData(): void {
     this.storageService.clearTokens();
     this.storageService.clearUserSettings();
@@ -269,17 +233,13 @@ export class AuthService {
     this.router.navigate(['/auth/login']);
   }
 
-  /**
-   * Manejar errores HTTP
-   */
+
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'Ha ocurrido un error';
 
     if (error.error instanceof ErrorEvent) {
-      // Error del lado del cliente
       errorMessage = `Error: ${error.error.message}`;
     } else {
-      // Error del lado del servidor
       if (error.error?.message) {
         errorMessage = error.error.message;
       } else if (error.error?.errors) {

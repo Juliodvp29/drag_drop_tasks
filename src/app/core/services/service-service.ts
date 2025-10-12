@@ -7,6 +7,5 @@ export class ServiceService {
 
   constructor() { }
 
-  // servicios auxiliares aquí
 
 }

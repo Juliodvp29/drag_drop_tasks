@@ -44,7 +44,6 @@ export class ColorPicker {
   customColorInput = signal<string>('#000000');
   isOpen = signal<boolean>(false);
 
-  // ControlValueAccessor implementation
   private onChange = (value: string | null) => { };
   private onTouched = () => { };
 
@@ -75,7 +74,6 @@ export class ColorPicker {
     this.selectedColor.set(color);
     this.onChange(color);
 
-    // Preparar el evento con información completa
     const colorEvent: ColorChangeEvent = {
       value: color,
       hex: color ? this.getColorCode(color) : null,
@@ -119,7 +117,6 @@ export class ColorPicker {
   applyCustomColor(): void {
     const customColor = this.customColorInput();
     if (this.isValidHexColor(customColor)) {
-      // Para colores personalizados, el hex es el mismo valor
       const colorEvent: ColorChangeEvent = {
         value: customColor,
         hex: customColor,
@@ -137,7 +134,6 @@ export class ColorPicker {
     return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color);
   }
 
-  // Cerrar dropdown cuando se hace click fuera
   @HostListener('document:keydown.escape')
   onEscapeKey(): void {
     if (this.isOpen()) {

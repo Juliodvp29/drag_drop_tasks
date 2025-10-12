@@ -27,7 +27,6 @@ export class Tasks implements OnInit {
   isDetailOpen = signal(false);
 
   ngOnInit(): void {
-    // Las listas se cargan automáticamente en el constructor del servicio
   }
 
   async createNewList(): Promise<void> {
@@ -39,7 +38,6 @@ export class Tasks implements OnInit {
 
     await this.taskService.createList(name, color, description);
 
-    // Limpiar formulario
     this.newListName.set('');
     this.newListDescription.set('');
     this.selectedColor.set('');
