@@ -18,7 +18,7 @@ export class MainLayout {
   isCollapsed = this.layoutService.isCollapsed;
 
   getMainClasses(): string {
-    const baseClasses = 'flex-1 md:ml-64 pt-20 md:pt-0 transition-all duration-300';
+    const baseClasses = 'flex-1 pt-20 md:pt-0 transition-all duration-300';
     const collapsedClasses = this.isCollapsed() ? 'md:ml-16' : 'md:ml-64';
     return `${baseClasses} ${collapsedClasses}`;
   }
