@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { AuthService } from '@/app/core/services/auth-service';
 import { LayoutService } from '@/app/core/services/layout-service';
 import { ToastService } from '@/app/core/services/toast-service';
@@ -7,7 +8,7 @@ import { Router, RouterLink } from '@angular/router';
 @Component({
   selector: 'app-side-nav',
   standalone: true,
-  imports: [RouterLink],
+  imports: [CommonModule, RouterLink],
   templateUrl: './side-nav.html',
   styleUrl: './side-nav.scss'
 })

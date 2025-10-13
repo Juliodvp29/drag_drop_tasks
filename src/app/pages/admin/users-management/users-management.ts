@@ -31,7 +31,7 @@ export class UsersManagement {
   error = signal<string | null>(null);
 
   currentPage = signal(1);
-  pageSize = signal(10);
+  pageSize = signal(6);
   totalItems = signal(0);
   totalPages = computed(() => Math.ceil(this.totalItems() / this.pageSize()));
 

@@ -146,7 +146,22 @@ export class SettingsProfile implements OnInit {
       next: (response) => {
         if (response.success) {
           this.toastService.success('Perfil actualizado correctamente');
-          this.authService.me().subscribe();
+          // Refrescar los datos del usuario después de la actualización
+          this.authService.me().subscribe({
+            next: (meResponse) => {
+              if (meResponse.success && meResponse.data.user) {
+                this.currentUser.set(meResponse.data.user);
+                this.profileForm.patchValue({
+                  first_name: meResponse.data.user.first_name,
+                  last_name: meResponse.data.user.last_name,
+                  profile_picture: meResponse.data.user.profile_picture || ''
+                });
+              }
+            },
+            error: (error) => {
+              console.error('Error refreshing user data after update:', error);
+            }
+          });
           this.isEditing.set(false);
         } else {
           this.toastService.error('Error al actualizar el perfil');

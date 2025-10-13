@@ -107,12 +107,12 @@ export class AuthService {
   }
 
 
-  me(): Observable<ApiResponse<User>> {
-    return this.http.get<ApiResponse<User>>(`${this.API_URL}/auth/me`).pipe(
+  me(): Observable<ApiResponse<{ user: User }>> {
+    return this.http.get<ApiResponse<{ user: User }>>(`${this.API_URL}/auth/me`).pipe(
       tap(response => {
-        if (response.success) {
-          this.currentUserSignal.set(response.data);
-          this.storageService.setUser(response.data);
+        if (response.success && response.data.user) {
+          this.currentUserSignal.set(response.data.user);
+          this.storageService.setUser(response.data.user);
         }
       }),
       catchError(this.handleError)
