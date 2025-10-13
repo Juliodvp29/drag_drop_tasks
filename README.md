@@ -1,6 +1,6 @@
 # 📋 Drag Drop Tasks
 
-Una aplicación completa de gestión de tareas y administración de usuarios con funcionalidad de arrastrar y soltar, construida con Angular 19 y diseñada con Tailwind CSS. Incluye sistema de autenticación, gestión de usuarios, calendario y configuración de perfil.
+Una aplicación completa de gestión de tareas y administración de usuarios con funcionalidad de arrastrar y soltar, construida con Angular 20 y diseñada con Tailwind CSS. Incluye sistema de autenticación, gestión de usuarios, calendario y configuración de perfil.
 
 ## ✨ Características
 
