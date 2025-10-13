@@ -76,6 +76,12 @@
     }
   </div>
 
+  @if (task.assigned_to) {
+  <div class="text-xs text-gray-500 mb-3 flex gap-3">
+    <span>👤 Asignada</span>
+  </div>
+  }
+
   @if (task.estimated_hours || task.actual_hours) {
   <div class="text-xs text-gray-500 mb-3 flex gap-3">
     @if (task.estimated_hours) {

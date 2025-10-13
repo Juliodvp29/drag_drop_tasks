@@ -1,7 +1,11 @@
+import { UserManagementService } from '@/app/pages/admin/service/user-management-service';
 import { ApiTask, ApiTaskList, TaskPriority } from '@/app/shared/models/task.model';
+import { UserListItem } from '@/app/shared/models/user-management.model';
 import { CommonModule } from '@angular/common';
 import { Component, computed, EventEmitter, inject, Input, Output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '@services/auth-service';
+import { firstValueFrom } from 'rxjs';
 import { TaskService } from '../../services/task-service';
 import { Card } from "../card/card";
 
@@ -18,12 +22,21 @@ export class List {
   @Output() taskDetailOpened = new EventEmitter<ApiTask>();
 
   taskService = inject(TaskService);
+  authService = inject(AuthService);
+  userService = inject(UserManagementService);
 
   newTaskTitle = signal('');
   newTaskDescription = signal('');
   selectedTaskPriority = signal<TaskPriority>(TaskPriority.MEDIUM);
+  selectedAssignedUser = signal<number | null>(null);
   showOptions = signal(false);
   showDescriptionInput = signal(false);
+  showAssignmentInput = signal(false);
+  availableUsers = signal<UserListItem[]>([]);
+  loadingUsers = signal(false);
+  userSearchQuery = signal('');
+  showUserDropdown = false;
+  filteredUsers = signal<UserListItem[]>([]);
 
   priorityStats = computed(() => {
     const tasks = this.list.tasks || [];
@@ -61,18 +74,22 @@ export class List {
     if (!title) return;
 
     const description = this.newTaskDescription().trim() || undefined;
+    const assignedTo = this.selectedAssignedUser();
 
     await this.taskService.createTask(
       title,
       this.list.id,
       this.selectedTaskPriority(),
-      description
+      description,
+      assignedTo || undefined
     );
 
     this.newTaskTitle.set('');
     this.newTaskDescription.set('');
     this.selectedTaskPriority.set(TaskPriority.MEDIUM);
+    this.selectedAssignedUser.set(null);
     this.showDescriptionInput.set(false);
+    this.showAssignmentInput.set(false);
   }
 
   async deleteList(): Promise<void> {
@@ -85,6 +102,76 @@ export class List {
 
   toggleDescriptionInput(): void {
     this.showDescriptionInput.set(!this.showDescriptionInput());
+  }
+
+  toggleAssignmentInput(): void {
+    this.showAssignmentInput.set(!this.showAssignmentInput());
+    if (this.showAssignmentInput() && this.availableUsers().length === 0) {
+      this.loadUsers();
+    }
+  }
+
+  async loadUsers(): Promise<void> {
+    if (!this.authService.hasPermission('users.view')) return;
+
+    try {
+      this.loadingUsers.set(true);
+      const response = await firstValueFrom(
+        this.userService.getUsers({ is_active: true, limit: 100 })
+      );
+      if (response.success) {
+        this.availableUsers.set(response.data);
+        this.filteredUsers.set(response.data);
+      }
+    } catch (error: any) {
+      console.error('Error loading users:', error);
+    } finally {
+      this.loadingUsers.set(false);
+    }
+  }
+
+  canAssignTasks(): boolean {
+    return this.authService.hasRole('admin') || this.authService.hasRole('super_admin');
+  }
+
+  filterUsers(): void {
+    const query = this.userSearchQuery().toLowerCase().trim();
+    if (!query) {
+      this.filteredUsers.set(this.availableUsers());
+    } else {
+      const filtered = this.availableUsers().filter(user =>
+        user.first_name.toLowerCase().includes(query) ||
+        user.last_name.toLowerCase().includes(query) ||
+        user.email.toLowerCase().includes(query)
+      );
+      this.filteredUsers.set(filtered);
+    }
+  }
+
+  selectUser(userId: number): void {
+    this.selectedAssignedUser.set(userId);
+    this.showUserDropdown = false;
+    this.userSearchQuery.set('');
+  }
+
+  clearUserSelection(): void {
+    this.selectedAssignedUser.set(null);
+    this.userSearchQuery.set('');
+  }
+
+  hideDropdown(): void {
+    // Delay hiding to allow click events on dropdown items
+    setTimeout(() => {
+      this.showUserDropdown = false;
+    }, 150);
+  }
+
+  getSelectedUserName(): string {
+    const userId = this.selectedAssignedUser();
+    if (!userId) return '';
+
+    const user = this.availableUsers().find(u => u.id === userId);
+    return user ? `${user.first_name} ${user.last_name} (${user.email})` : '';
   }
 
   formatDate(dateString: string): string {

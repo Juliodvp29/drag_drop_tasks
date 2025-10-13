@@ -1,6 +1,6 @@
 import { ConfirmationService } from '@/app/core/services/confirmation-service';
 import { ToastService } from '@/app/core/services/toast-service';
-import { ApiTask, ApiTaskList, TaskComment, TaskPriority, TaskStatus } from '@/app/shared/models/task.model';
+import { ApiTask, ApiTaskList, TaskComment, TaskPriority, TaskQueryParams, TaskStatus } from '@/app/shared/models/task.model';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { CommentService } from './comment-service';
@@ -21,10 +21,16 @@ export class TaskService {
   private listsSignal = signal<ApiTaskList[]>([]);
   private loadingSignal = signal<boolean>(false);
   private errorSignal = signal<string | null>(null);
+  private searchResultsSignal = signal<ApiTask[]>([]);
+  private searchLoadingSignal = signal<boolean>(false);
+  private searchErrorSignal = signal<string | null>(null);
 
   public lists = computed(() => this.listsSignal());
   public loading = computed(() => this.loadingSignal());
   public error = computed(() => this.errorSignal());
+  public searchResults = computed(() => this.searchResultsSignal());
+  public searchLoading = computed(() => this.searchLoadingSignal());
+  public searchError = computed(() => this.searchErrorSignal());
 
   constructor() {
     this.loadLists();
@@ -144,7 +150,8 @@ export class TaskService {
     title: string,
     listId: number,
     priority: TaskPriority = TaskPriority.MEDIUM,
-    description?: string
+    description?: string,
+    assignedTo?: number
   ): Promise<void> {
     try {
       this.loadingSignal.set(true);
@@ -154,7 +161,8 @@ export class TaskService {
           title,
           description,
           priority,
-          list_id: listId
+          list_id: listId,
+          assigned_to: assignedTo
         })
       );
 
@@ -400,5 +408,31 @@ export class TaskService {
     } finally {
       this.loadingSignal.set(false);
     }
+  }
+
+  async searchTasks(params: TaskQueryParams): Promise<void> {
+    try {
+      this.searchLoadingSignal.set(true);
+      this.searchErrorSignal.set(null);
+
+      const response = await firstValueFrom(
+        this.taskApiService.getTasks(params)
+      );
+
+      if (response.success) {
+        this.searchResultsSignal.set(response.data);
+      }
+    } catch (error: any) {
+      this.searchErrorSignal.set(error.message);
+      this.toastService.error('Error al buscar tareas');
+      console.error('Error searching tasks:', error);
+    } finally {
+      this.searchLoadingSignal.set(false);
+    }
+  }
+
+  clearSearchResults(): void {
+    this.searchResultsSignal.set([]);
+    this.searchErrorSignal.set(null);
   }
 }

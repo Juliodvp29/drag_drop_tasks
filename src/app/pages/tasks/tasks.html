@@ -3,6 +3,121 @@
     <div class="mb-8">
       <h1 class="text-4xl font-bold text-gray-800 mb-4">Gestión de Tareas</h1>
 
+      <!-- Search and Filters Section -->
+      <div class="bg-white rounded-lg p-6 shadow-md mb-6">
+        <div class="flex flex-col space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-semibold text-gray-700">Buscar y Filtrar Tareas</h2>
+            <button (click)="toggleFilters()" class="text-sm text-primary hover:text-primary-dark font-medium">
+              {{ showFilters() ? 'Ocultar filtros' : 'Mostrar filtros' }}
+              <span class="ml-1">{{ showFilters() ? '▲' : '▼' }}</span>
+            </button>
+          </div>
+
+          <!-- Search Input -->
+          <div class="flex gap-4">
+            <div class="flex-1">
+              <input type="text" placeholder="Buscar por título o descripción..." [(ngModel)]="searchQuery"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
+            </div>
+            <button (click)="performSearch()" [disabled]="taskService.searchLoading()"
+              class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors">
+              @if (taskService.searchLoading()) {
+              <span class="inline-block animate-spin mr-2">⏳</span>
+              }
+              Buscar
+            </button>
+            <button (click)="clearSearch()"
+              class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+              Limpiar
+            </button>
+          </div>
+
+          <!-- Advanced Filters -->
+          @if (showFilters()) {
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-200">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+              <select [(ngModel)]="selectedStatus"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                <option value="">Todos los estados</option>
+                @for (status of taskStatuses; track status) {
+                <option [value]="status">{{ status.replace('_', ' ').toUpperCase() }}</option>
+                }
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Prioridad</label>
+              <select [(ngModel)]="selectedPriority"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                <option value="">Todas las prioridades</option>
+                @for (priority of taskPriorities; track priority) {
+                <option [value]="priority">{{ priority.toUpperCase() }}</option>
+                }
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Asignado a</label>
+              <input type="number" placeholder="ID del usuario" [(ngModel)]="selectedAssignedTo"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Search Results -->
+      @if (taskService.searchResults().length > 0) {
+      <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-blue-800 dark:text-blue-200">Resultados de búsqueda ({{ taskService.searchResults().length }} tareas)</h3>
+          <button (click)="clearSearch()" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium">
+            ✕ Cerrar resultados
+          </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          @for (task of taskService.searchResults(); track task.id) {
+          <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-blue-200 dark:border-blue-700">
+            <div class="flex items-start justify-between mb-2">
+              <h4 class="font-medium text-gray-900 dark:text-gray-100">{{ task.title }}</h4>
+              <span
+               class="px-2 py-1 text-xs rounded-full {{ task.status === 'completed' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : task.status === 'in_progress' ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200' }}">
+                {{ task.status.replace('_', ' ') }}
+              </span>
+            </div>
+            @if (task.description) {
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ task.description }}</p>
+            }
+            <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+              <span>Prioridad: {{ task.priority }}</span>
+              @if (task.due_date) {
+              <span>Vence: {{ task.due_date | date:'short' }}</span>
+              }
+            </div>
+            <button (click)="openTaskDetail(task)"
+             class="mt-3 w-full px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white text-sm rounded hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors">
+              Ver detalles
+            </button>
+          </div>
+          }
+        </div>
+      </div>
+      }
+
+      @if (taskService.searchError()) {
+      <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+        <div class="flex items-center gap-2">
+          <span class="text-red-600 text-xl">⚠️</span>
+          <div>
+            <h3 class="text-red-800 font-semibold">Error en búsqueda</h3>
+            <p class="text-red-700 text-sm">{{ taskService.searchError() }}</p>
+          </div>
+        </div>
+      </div>
+      }
+
       <div class="bg-white rounded-lg p-6 shadow-md mb-6">
         <h2 class="text-xl font-semibold text-gray-700 mb-4">Crear Nueva Lista</h2>
         <div class="space-y-3">
@@ -71,7 +186,6 @@
 
     @if (!taskService.loading() && taskService.lists().length === 0) {
     <div class="text-center py-12">
-      <div class="text-gray-400 text-6xl mb-4">📋</div>
       <h3 class="text-xl font-semibold text-gray-600 mb-2">No hay listas creadas</h3>
       <p class="text-gray-500">Crea tu primera lista para comenzar a organizar tus tareas</p>
     </div>

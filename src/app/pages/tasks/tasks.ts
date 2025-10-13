@@ -1,6 +1,6 @@
 import { ColorPicker } from '@/app/shared/components/color-picker/color-picker';
 import { ColorChangeEvent } from '@/app/shared/models/color-picker';
-import { ApiTask } from '@/app/shared/models/task.model';
+import { ApiTask, TaskPriority, TaskQueryParams, TaskStatus } from '@/app/shared/models/task.model';
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -25,6 +25,14 @@ export class Tasks implements OnInit {
 
   selectedTask = signal<ApiTask | null>(null);
   isDetailOpen = signal(false);
+
+  // Search and filters
+  searchQuery = signal('');
+  selectedStatus = signal<TaskStatus | ''>('');
+  selectedPriority = signal<TaskPriority | ''>('');
+  selectedAssignedTo = signal<number | null>(null);
+  showFilters = signal(false);
+  isSearching = signal(false);
 
   ngOnInit(): void {
   }
@@ -64,6 +72,50 @@ export class Tasks implements OnInit {
   closeTaskDetail(): void {
     this.isDetailOpen.set(false);
     this.selectedTask.set(null);
+  }
+
+  async performSearch(): Promise<void> {
+    const params: TaskQueryParams = {};
+
+    if (this.searchQuery().trim()) {
+      params.search = this.searchQuery().trim();
+    }
+
+    if (this.selectedStatus()) {
+      params.status = this.selectedStatus() as TaskStatus;
+    }
+
+    if (this.selectedPriority()) {
+      params.priority = this.selectedPriority() as TaskPriority;
+    }
+
+    if (this.selectedAssignedTo()) {
+      params.assigned_to = this.selectedAssignedTo()!;
+    }
+
+    this.isSearching.set(true);
+    await this.taskService.searchTasks(params);
+    this.isSearching.set(false);
+  }
+
+  clearSearch(): void {
+    this.searchQuery.set('');
+    this.selectedStatus.set('');
+    this.selectedPriority.set('');
+    this.selectedAssignedTo.set(null);
+    this.taskService.clearSearchResults();
+  }
+
+  toggleFilters(): void {
+    this.showFilters.set(!this.showFilters());
+  }
+
+  get taskStatuses(): TaskStatus[] {
+    return Object.values(TaskStatus);
+  }
+
+  get taskPriorities(): TaskPriority[] {
+    return Object.values(TaskPriority);
   }
 
 }
