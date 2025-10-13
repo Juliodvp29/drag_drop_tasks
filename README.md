@@ -8,6 +8,7 @@ Una aplicación completa de gestión de tareas y administración de usuarios con
 - Crea, edita y elimina tareas fácilmente
 - Sistema de prioridades (Baja, Media, Alta, Urgente)
 - Drag & Drop intuitivo entre listas
+- 🔍 **Búsqueda Avanzada**: Filtros por estado, prioridad, asignado y texto
 - Persistencia automática en localStorage
 
 ### 👥 Sistema de Autenticación y Usuarios
@@ -52,7 +53,7 @@ Una aplicación completa de gestión de tareas y administración de usuarios con
 
 1. **Clona el repositorio**
 ```bash
-git clone https://github.com/tu-usuario/drag-drop-tasks.git
+git clone https://github.com/Juliodvp29/drag-drop-tasks.git
 cd drag-drop-tasks
 ```
 
@@ -169,6 +170,7 @@ src/
 - **Estados de Tareas**: Pendiente, En Progreso, Completada
 - **Comentarios**: Sistema de comentarios en tareas
 - **Asignación**: Asignar tareas a usuarios
+- **Búsqueda Avanzada**: Filtros por estado, prioridad, usuario asignado y búsqueda por texto
 
 ### 🎨 Drag & Drop Avanzado
 - **Mover entre Listas**: Arrastrar tareas intuitivamente
@@ -210,6 +212,7 @@ Gestión avanzada de tareas:
 - Sistema de prioridades y estados
 - Drag & Drop entre listas
 - Comentarios y asignaciones
+- 🔍 **Búsqueda Avanzada**: Filtros por múltiples criterios usando API endpoints
 
 ### StorageService
 Persistencia robusta:
@@ -244,19 +247,6 @@ Sistema de temas dinámicos:
 - Soporte para colores personalizados
 - Integración con Angular Forms (ControlValueAccessor)
 
-## 🚀 Próximas Funcionalidades
-
-- [ ] 🔍 **Sistema de Búsqueda Avanzada**: Filtros por fecha, prioridad, asignado, estado
-- [ ] 🏷️ **Etiquetas/Tags**: Sistema de categorización de tareas
-- [ ] 📊 **Dashboard Analytics**: Estadísticas y métricas de productividad
-- [ ] 📱 **PWA**: Progressive Web App con notificaciones push
-- [ ] 🔄 **Sincronización**: Sincronización offline/online
-- [ ] 👥 **Colaboración**: Compartir listas y asignar tareas a múltiples usuarios
-- [ ] 📎 **Adjuntos**: Subir archivos y documentos a tareas
-- [ ] ⏰ **Recordatorios**: Notificaciones y alertas de tareas
-- [ ] 📈 **Reportes**: Generación de reportes de productividad
-- [ ] 🔗 **Integraciones**: Conexión con Google Calendar, Slack, etc.
-
 ## 🤝 Contribuir
 
 1. Fork el proyecto
@@ -283,13 +273,12 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 - ✅ Gestión de usuarios y roles (RBAC)
 - ✅ Perfil de usuario con verificación de email
 - ✅ Gestión de tareas con drag & drop
+- ✅ 🔍 Búsqueda avanzada con filtros múltiples
 - ✅ Calendario integrado
 - ✅ Sistema de temas (oscuro/claro)
 - ✅ Diseño responsivo completo
 
 ### 🔄 En Desarrollo
-- 🔄 Dashboard con estadísticas
-- 🔄 Sistema de búsqueda avanzada
 - 🔄 Notificaciones push
 - 🔄 PWA capabilities
 
