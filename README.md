@@ -244,19 +244,6 @@ Sistema de temas dinámicos:
 - Soporte para colores personalizados
 - Integración con Angular Forms (ControlValueAccessor)
 
-## 🚀 Próximas Funcionalidades
-
-- [ ] 🔍 **Sistema de Búsqueda Avanzada**: Filtros por fecha, prioridad, asignado, estado
-- [ ] 🏷️ **Etiquetas/Tags**: Sistema de categorización de tareas
-- [ ] 📊 **Dashboard Analytics**: Estadísticas y métricas de productividad
-- [ ] 📱 **PWA**: Progressive Web App con notificaciones push
-- [ ] 🔄 **Sincronización**: Sincronización offline/online
-- [ ] 👥 **Colaboración**: Compartir listas y asignar tareas a múltiples usuarios
-- [ ] 📎 **Adjuntos**: Subir archivos y documentos a tareas
-- [ ] ⏰ **Recordatorios**: Notificaciones y alertas de tareas
-- [ ] 📈 **Reportes**: Generación de reportes de productividad
-- [ ] 🔗 **Integraciones**: Conexión con Google Calendar, Slack, etc.
-
 ## 🤝 Contribuir
 
 1. Fork el proyecto
