@@ -109,7 +109,6 @@ export class CalendarService {
       .pipe(
         tap(response => {
           if (response.success && response.data) {
-            // No sobrescribe todos los eventos, solo agrega/actualiza
             const newEvents = this.parseEvents(response.data);
             this.mergeEvents(newEvents);
           }

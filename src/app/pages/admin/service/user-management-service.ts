@@ -96,6 +96,22 @@ export class UserManagementService {
   }
 
 
+  sendVerificationCode(userId: number): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(
+      `${this.API_URL}/${userId}/send-verification-code`,
+      {}
+    ).pipe(catchError(this.handleError));
+  }
+
+
+  verifyEmail(userId: number, verificationCode: string): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(
+      `${this.API_URL}/${userId}/verify-email`,
+      { verification_code: verificationCode }
+    ).pipe(catchError(this.handleError));
+  }
+
+
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'Ha ocurrido un error';
 

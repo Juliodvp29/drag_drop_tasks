@@ -18,12 +18,10 @@ export class TaskService {
   private toastService = inject(ToastService);
   private confirmationService = inject(ConfirmationService);
 
-  // Signals
   private listsSignal = signal<ApiTaskList[]>([]);
   private loadingSignal = signal<boolean>(false);
   private errorSignal = signal<string | null>(null);
 
-  // Computed signals públicos
   public lists = computed(() => this.listsSignal());
   public loading = computed(() => this.loadingSignal());
   public error = computed(() => this.errorSignal());
@@ -32,9 +30,7 @@ export class TaskService {
     this.loadLists();
   }
 
-  /**
-   * Cargar todas las listas con sus tareas
-   */
+
   async loadLists(): Promise<void> {
     try {
       this.loadingSignal.set(true);
@@ -56,9 +52,7 @@ export class TaskService {
     }
   }
 
-  /**
-   * Crear nueva lista
-   */
+
   async createList(name: string, color?: string, description?: string): Promise<void> {
     try {
       this.loadingSignal.set(true);
@@ -73,7 +67,6 @@ export class TaskService {
       );
 
       if (response.success) {
-        // Recargar listas después de crear
         await this.loadLists();
         this.toastService.success('Lista creada exitosamente');
       }
@@ -86,9 +79,7 @@ export class TaskService {
     }
   }
 
-  /**
-   * Actualizar una lista
-   */
+
   async updateList(
     listId: number,
     name?: string,
@@ -115,9 +106,7 @@ export class TaskService {
     }
   }
 
-  /**
-   * Eliminar lista
-   */
+
   async deleteList(listId: number): Promise<void> {
     const list = this.lists().find(l => l.id === listId);
     if (!list) return;
@@ -150,9 +139,7 @@ export class TaskService {
     }
   }
 
-  /**
-   * Crear nueva tarea
-   */
+
   async createTask(
     title: string,
     listId: number,
@@ -184,9 +171,7 @@ export class TaskService {
     }
   }
 
-  /**
-   * Actualizar tarea
-   */
+
   async updateTask(
     taskId: number,
     updates: {
@@ -216,9 +201,7 @@ export class TaskService {
     }
   }
 
-  /**
-   * Completar tarea
-   */
+
   async completeTask(taskId: number): Promise<void> {
     try {
       this.loadingSignal.set(true);
@@ -239,9 +222,7 @@ export class TaskService {
     }
   }
 
-  /**
-   * Eliminar tarea
-   */
+
   async deleteTask(taskId: number): Promise<void> {
     const confirmed = await firstValueFrom(
       this.confirmationService.confirmDelete(
@@ -271,9 +252,7 @@ export class TaskService {
     }
   }
 
-  /**
-   * Mover tarea entre listas
-   */
+
   async moveTask(taskId: number, sourceListId: number, targetListId: number): Promise<void> {
     try {
       this.loadingSignal.set(true);
@@ -298,9 +277,7 @@ export class TaskService {
     }
   }
 
-  /**
-   * Reordenar listas
-   */
+
   async reorderLists(lists: Array<{ id: number; position: number }>): Promise<void> {
     try {
       this.loadingSignal.set(true);
@@ -320,9 +297,6 @@ export class TaskService {
     }
   }
 
-  /**
-   * Obtener tarea por ID
-   */
   getTaskById(taskId: number): ApiTask | undefined {
     for (const list of this.lists()) {
       const task = list.tasks?.find(t => t.id === taskId);
@@ -331,16 +305,10 @@ export class TaskService {
     return undefined;
   }
 
-  /**
-   * Obtener lista por ID
-   */
   getListById(listId: number): ApiTaskList | undefined {
     return this.lists().find(l => l.id === listId);
   }
 
-  /**
-   * Obtener comentarios de una tarea
-   */
   async getComments(taskId: number): Promise<TaskComment[]> {
     try {
       this.loadingSignal.set(true);
@@ -352,8 +320,6 @@ export class TaskService {
 
       if (response.success) {
         console.log('API response data:', response.data);
-        // Si la API devuelve {comments: []}, usar response.data.comments
-        // Si devuelve directamente [], usar response.data
         const data = response.data as any;
         return Array.isArray(data) ? data : (data.comments || []);
       }
@@ -368,9 +334,6 @@ export class TaskService {
     }
   }
 
-  /**
-   * Agregar comentario a una tarea
-   */
   async createComment(taskId: number, content: string): Promise<void> {
     try {
       this.loadingSignal.set(true);
@@ -391,9 +354,6 @@ export class TaskService {
     }
   }
 
-  /**
-   * Editar comentario
-   */
   async updateComment(taskId: number, commentId: number, content: string): Promise<void> {
     try {
       this.loadingSignal.set(true);
@@ -414,9 +374,6 @@ export class TaskService {
     }
   }
 
-  /**
-   * Eliminar comentario
-   */
   async deleteComment(taskId: number, commentId: number): Promise<void> {
     const confirmed = await firstValueFrom(
       this.confirmationService.confirmDelete(

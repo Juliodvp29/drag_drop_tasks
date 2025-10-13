@@ -29,15 +29,18 @@ export class SettingsProfile implements OnInit {
   userSettings = signal<UserSettings | null>(null);
   isEditing = signal(false);
   isLoading = signal(false);
+  showVerificationModal = signal(false);
+  resendDisabled = signal(false);
+  countdown = signal(0);
 
   profileForm!: FormGroup;
   settingsForm!: FormGroup;
+  verificationForm!: FormGroup;
 
   ngOnInit(): void {
     this.initializeForms();
     this.loadUserData();
 
-    // Forzar actualización del formulario cuando cambie el tema
     this.settingsForm.get('theme')?.valueChanges.subscribe(value => {
       if (value) {
         this.themeService.setTheme(value);
@@ -66,6 +69,10 @@ export class SettingsProfile implements OnInit {
       dashboard_layout: this.fb.group({
         widgets: [[]]
       })
+    });
+
+    this.verificationForm = this.fb.group({
+      verification_code: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]]
     });
   }
 
@@ -146,7 +153,6 @@ export class SettingsProfile implements OnInit {
       next: (response) => {
         if (response.success) {
           this.toastService.success('Perfil actualizado correctamente');
-          // Refrescar los datos del usuario después de la actualización
           this.authService.me().subscribe({
             next: (meResponse) => {
               if (meResponse.success && meResponse.data.user) {
@@ -244,7 +250,105 @@ export class SettingsProfile implements OnInit {
     if (field.errors['email']) {
       return 'Email inválido';
     }
+    if (field.errors['pattern']) {
+      return 'El código debe tener 6 dígitos';
+    }
 
     return 'Campo inválido';
+  }
+
+
+  sendVerificationCode(): void {
+    const user = this.currentUser();
+    if (!user?.id) return;
+
+    this.loaderService.show();
+    this.userManagementService.sendVerificationCode(user.id).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.toastService.success('Código de verificación enviado a tu email');
+          this.showVerificationModal.set(true);
+          this.startCountdown();
+        } else {
+          this.toastService.error('Error al enviar el código de verificación');
+        }
+      },
+      error: (error) => {
+        console.error('Error sending verification code:', error);
+        this.toastService.error('Error al enviar el código de verificación');
+      },
+      complete: () => {
+        this.loaderService.hide();
+      }
+    });
+  }
+
+
+  verifyEmail(): void {
+    if (this.verificationForm.invalid) {
+      this.markFormGroupTouched(this.verificationForm);
+      return;
+    }
+
+    const user = this.currentUser();
+    if (!user?.id) return;
+
+    this.loaderService.show();
+    const code = this.verificationForm.value.verification_code;
+
+    this.userManagementService.verifyEmail(user.id, code).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.toastService.success('Email verificado correctamente');
+          this.showVerificationModal.set(false);
+          this.verificationForm.reset();
+          this.authService.me().subscribe({
+            next: (meResponse) => {
+              if (meResponse.success && meResponse.data.user) {
+                this.currentUser.set(meResponse.data.user);
+              }
+            },
+            error: (error) => {
+              console.error('Error refreshing user data after verification:', error);
+            }
+          });
+        } else {
+          this.toastService.error('Código de verificación inválido');
+        }
+      },
+      error: (error) => {
+        console.error('Error verifying email:', error);
+        this.toastService.error('Error al verificar el email');
+      },
+      complete: () => {
+        this.loaderService.hide();
+      }
+    });
+  }
+
+
+  resendVerificationCode(): void {
+    if (this.resendDisabled()) return;
+    this.sendVerificationCode();
+  }
+
+
+  closeVerificationModal(): void {
+    this.showVerificationModal.set(false);
+    this.verificationForm.reset();
+  }
+
+
+  private startCountdown(): void {
+    this.resendDisabled.set(true);
+    this.countdown.set(60);
+
+    const interval = setInterval(() => {
+      this.countdown.update(value => value - 1);
+      if (this.countdown() <= 0) {
+        clearInterval(interval);
+        this.resendDisabled.set(false);
+      }
+    }, 1000);
   }
 }

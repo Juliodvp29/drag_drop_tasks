@@ -1,6 +1,5 @@
 import { ApiResponse } from "./auth.model";
 
-// Enums
 export enum TaskStatus {
   PENDING = 'pending',
   IN_PROGRESS = 'in_progress',
@@ -15,7 +14,6 @@ export enum TaskPriority {
   URGENT = 'urgent'
 }
 
-// Interfaces para Task
 export interface ApiTask {
   id: number;
   title: string;

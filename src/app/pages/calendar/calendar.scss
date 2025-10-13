@@ -485,7 +485,6 @@ input[type="checkbox"] {
   border-color: var(--color-primary) !important;
 }
 
-// Estados hover para los días del calendario
 :host ::ng-deep .min-h-\[120px\]:hover,
 :host ::ng-deep .min-h-\[140px\]:hover {
   background-color: var(--bg-tertiary) !important;

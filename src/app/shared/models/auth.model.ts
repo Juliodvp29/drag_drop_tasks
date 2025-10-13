@@ -43,6 +43,7 @@ export interface User {
   last_name: string;
   profile_picture?: string;
   is_active: boolean;
+  is_email_verified?: boolean | number;
   role: Role;
   created_at: Date;
   updated_at: Date;
