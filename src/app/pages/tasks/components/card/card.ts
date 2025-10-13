@@ -1,5 +1,5 @@
-import { Task } from '@/app/shared/models/task.model';
-import { TaskUtils } from '@/app/shared/utils/task.utils';
+
+import { ApiTask, TaskPriority, TaskStatus } from '@/app/shared/models/task.model';
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
 
@@ -11,14 +11,20 @@ import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
 })
 export class Card {
 
-  @Input({ required: true }) task!: Task;
-  @Output() taskMoved = new EventEmitter<{ taskId: string, sourceListId: string, targetListId: string }>();
-  @Output() taskDeleted = new EventEmitter<string>();
-  @Output() taskCompleted = new EventEmitter<string>();
+  @Input({ required: true }) task!: ApiTask;
+  @Output() taskMoved = new EventEmitter<{ taskId: number, sourceListId: number, targetListId: number }>();
+  @Output() taskDeleted = new EventEmitter<number>();
+  @Output() taskCompleted = new EventEmitter<number>();
+  @Output() taskDetailOpened = new EventEmitter<ApiTask>();
 
   isDragging = signal(false);
 
-  formatDate(date: Date): string {
+  get isCompleted(): boolean {
+    return this.task.status === TaskStatus.COMPLETED || !!this.task.completed_at;
+  }
+
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
     return new Intl.DateTimeFormat('es-ES', {
       day: 'numeric',
       month: 'short',
@@ -28,19 +34,63 @@ export class Card {
   }
 
   getPriorityBorderClass(): string {
-    return TaskUtils.getPriorityBorderClass(this.task.priority);
+    switch (this.task.priority) {
+      case TaskPriority.LOW:
+        return 'border-l-success';
+      case TaskPriority.MEDIUM:
+        return 'border-l-info';
+      case TaskPriority.HIGH:
+        return 'border-l-warning';
+      case TaskPriority.URGENT:
+        return 'border-l-error';
+      default:
+        return 'border-l-gray-300';
+    }
   }
 
   getPriorityBadgeClass(): string {
-    return TaskUtils.getPriorityBadgeClass(this.task.priority);
+    switch (this.task.priority) {
+      case TaskPriority.LOW:
+        return 'bg-success bg-opacity-20 text-green-700';
+      case TaskPriority.MEDIUM:
+        return 'bg-info bg-opacity-20 text-blue-700';
+      case TaskPriority.HIGH:
+        return 'bg-warning bg-opacity-20 text-yellow-700';
+      case TaskPriority.URGENT:
+        return 'bg-error bg-opacity-20 text-red-700';
+      default:
+        return 'bg-gray-200 text-gray-700';
+    }
   }
 
   getPriorityLabel(): string {
-    return TaskUtils.getPriorityLabel(this.task.priority);
+    switch (this.task.priority) {
+      case TaskPriority.LOW:
+        return 'Baja';
+      case TaskPriority.MEDIUM:
+        return 'Media';
+      case TaskPriority.HIGH:
+        return 'Alta';
+      case TaskPriority.URGENT:
+        return 'Urgente';
+      default:
+        return 'Normal';
+    }
   }
 
   getPriorityIcon(): string {
-    return TaskUtils.getPriorityIcon(this.task.priority);
+    switch (this.task.priority) {
+      case TaskPriority.LOW:
+        return '🟢';
+      case TaskPriority.MEDIUM:
+        return '🟡';
+      case TaskPriority.HIGH:
+        return '🟠';
+      case TaskPriority.URGENT:
+        return '🔴';
+      default:
+        return '⚪';
+    }
   }
 
   onDragStart(event: DragEvent): void {
@@ -48,7 +98,7 @@ export class Card {
 
     const dragData = {
       taskId: this.task.id,
-      sourceListId: this.task.listId
+      sourceListId: this.task.list_id
     };
 
     event.dataTransfer?.setData('text/plain', JSON.stringify(dragData));
@@ -66,12 +116,14 @@ export class Card {
   }
 
   deleteTask(): void {
-    if (confirm('¿Estás seguro de que deseas eliminar esta tarea?')) {
-      this.taskDeleted.emit(this.task.id);
-    }
+    this.taskDeleted.emit(this.task.id);
   }
 
   markAsCompleted(): void {
     this.taskCompleted.emit(this.task.id);
+  }
+
+  onDblClick(): void {
+    this.taskDetailOpened.emit(this.task);
   }
 }

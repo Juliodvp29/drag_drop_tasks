@@ -15,12 +15,12 @@ export enum RecurrenceFrequency {
 
 export interface RecurrenceRule {
   frequency: RecurrenceFrequency;
-  interval: number; // cada cuántos intervalos se repite
+  interval: number;
   end_date?: Date;
-  count?: number; // número de ocurrencias
-  by_weekday?: number[]; // [0-6] domingo a sábado
-  by_month_day?: number[]; // [1-31]
-  by_month?: number[]; // [1-12]
+  count?: number;
+  by_weekday?: number[];
+  by_month_day?: number[];
+  by_month?: number[];
 }
 
 export interface CalendarEvent {
@@ -77,15 +77,14 @@ export interface EventsQueryParams {
 }
 
 export interface EventRangeParams {
-  start_date: string; // YYYY-MM-DD
-  end_date: string;   // YYYY-MM-DD
+  start_date: string;
+  end_date: string;
 }
 
 export interface UpcomingEventsParams {
-  days?: number; // default: 30, max: 365
+  days?: number;
 }
 
-// Respuestas de la API
 export interface CalendarEventResponse {
   success: boolean;
   message: string;
@@ -104,7 +103,6 @@ export interface CalendarEventsResponse {
   };
 }
 
-// Para el componente de calendario
 export interface CalendarDay {
   date: Date;
   day: number;

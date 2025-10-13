@@ -43,6 +43,7 @@ export interface User {
   last_name: string;
   profile_picture?: string;
   is_active: boolean;
+  is_email_verified?: boolean | number;
   role: Role;
   created_at: Date;
   updated_at: Date;
@@ -76,4 +77,26 @@ export interface ApiError {
   success: false;
   message: string;
   errors?: string[];
+}
+
+export interface CreateRoleRequest {
+  name: string;
+  display_name: string;
+  description?: string;
+  permissions: string[];
+}
+
+export interface UpdateRoleRequest {
+  display_name?: string;
+  description?: string;
+  permissions?: string[];
+  is_active?: boolean;
+}
+
+export interface Permission {
+  id: string;
+  name: string;
+  display_name: string;
+  description?: string;
+  category: string;
 }

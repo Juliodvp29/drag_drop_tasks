@@ -1,0 +1,108 @@
+:host ::ng-deep .bg-white {
+  background-color: var(--bg-primary) !important;
+}
+
+:host ::ng-deep .text-gray-800,
+:host ::ng-deep .text-gray-900 {
+  color: var(--text-primary) !important;
+}
+
+:host ::ng-deep .text-gray-700 {
+  color: var(--text-secondary) !important;
+}
+
+:host ::ng-deep .text-gray-600,
+:host ::ng-deep .text-gray-500 {
+  color: var(--text-tertiary) !important;
+}
+
+:host ::ng-deep .text-gray-400 {
+  color: var(--text-tertiary) !important;
+}
+
+:host ::ng-deep .border-gray-200,
+:host ::ng-deep .border-gray-300 {
+  border-color: var(--border-primary) !important;
+}
+
+:host ::ng-deep .hover\:text-gray-600:hover {
+  color: var(--text-secondary) !important;
+}
+
+:host ::ng-deep .hover\:bg-gray-50:hover {
+  background-color: var(--bg-secondary) !important;
+}
+
+:host ::ng-deep .text-red-500 {
+  color: var(--color-error) !important;
+}
+
+:host ::ng-deep .border-red-500 {
+  border-color: var(--color-error) !important;
+}
+
+:host ::ng-deep .bg-primary {
+  background-color: var(--color-primary) !important;
+}
+
+:host ::ng-deep .text-white {
+  color: white !important;
+}
+
+:host ::ng-deep .hover\:bg-primary-dark:hover {
+  background-color: var(--color-primary-hover) !important;
+}
+
+:host ::ng-deep .text-gray-700 {
+  color: var(--text-secondary) !important;
+}
+
+:host ::ng-deep .border-gray-300 {
+  border-color: var(--border-primary) !important;
+}
+
+:host ::ng-deep .focus\:ring-primary:focus {
+  --tw-ring-color: var(--color-primary) !important;
+}
+
+:host ::ng-deep .focus\:border-transparent:focus {
+  border-color: var(--color-primary) !important;
+}
+
+:host ::ng-deep .disabled\:bg-gray-100:disabled {
+  background-color: var(--bg-tertiary) !important;
+}
+
+:host ::ng-deep .disabled\:cursor-not-allowed:disabled {
+  cursor: not-allowed !important;
+}
+
+:host ::ng-deep .text-primary {
+  color: var(--color-primary) !important;
+}
+
+:host ::ng-deep .bg-gray-50 {
+  background-color: var(--bg-secondary) !important;
+}
+
+:host ::ng-deep .hover\:text-gray-600:hover {
+  color: var(--text-secondary) !important;
+}
+
+:host ::ng-deep input,
+:host ::ng-deep select {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-primary) !important;
+}
+
+:host ::ng-deep input::placeholder,
+:host ::ng-deep select::placeholder {
+  color: var(--text-tertiary) !important;
+}
+
+:host ::ng-deep input:focus,
+:host ::ng-deep select:focus {
+  border-color: var(--color-primary) !important;
+  --tw-ring-color: var(--color-primary) !important;
+}

@@ -1,7 +1,4 @@
-import { TaskList } from '@/app/shared/models/list.model';
-import { TaskPriority } from '@/app/shared/models/task.model';
-import { SortTasksPipe } from '@/app/shared/pipes/sort-tasks-pipe';
-import { TaskUtils } from '@/app/shared/utils/task.utils';
+import { ApiTask, ApiTaskList, TaskPriority } from '@/app/shared/models/task.model';
 import { CommonModule } from '@angular/common';
 import { Component, computed, EventEmitter, inject, Input, Output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -10,62 +7,94 @@ import { Card } from "../card/card";
 
 @Component({
   selector: 'app-list',
-  imports: [CommonModule, FormsModule, Card, SortTasksPipe],
+  imports: [CommonModule, FormsModule, Card],
   templateUrl: './list.html',
   styleUrl: './list.scss'
 })
 export class List {
 
-  @Input({ required: true }) list!: TaskList;
-  @Output() taskMoved = new EventEmitter<{ taskId: string, sourceListId: string, targetListId: string }>();
+  @Input({ required: true }) list!: ApiTaskList;
+  @Output() taskMoved = new EventEmitter<{ taskId: number, sourceListId: number, targetListId: number }>();
+  @Output() taskDetailOpened = new EventEmitter<ApiTask>();
 
   taskService = inject(TaskService);
 
+  newTaskTitle = signal('');
   newTaskDescription = signal('');
   selectedTaskPriority = signal<TaskPriority>(TaskPriority.MEDIUM);
   showOptions = signal(false);
+  showDescriptionInput = signal(false);
 
-  // Computed para las estadísticas de prioridad
-  priorityStats = computed(() => TaskUtils.getPriorityStats(this.list.tasks));
+  priorityStats = computed(() => {
+    const tasks = this.list.tasks || [];
+    const activeTasks = tasks.filter(task => task.status !== 'completed' && !task.completed_at);
 
-  createTask(): void {
-    const description = this.newTaskDescription().trim();
-    if (description) {
-      this.taskService.createTask(description, this.list.id, this.selectedTaskPriority());
-      this.newTaskDescription.set('');
-      this.selectedTaskPriority.set(TaskPriority.MEDIUM);
-    }
+    return {
+      urgent: activeTasks.filter(t => t.priority === TaskPriority.URGENT).length,
+      high: activeTasks.filter(t => t.priority === TaskPriority.HIGH).length,
+      medium: activeTasks.filter(t => t.priority === TaskPriority.MEDIUM).length,
+      low: activeTasks.filter(t => t.priority === TaskPriority.LOW).length,
+      total: activeTasks.length,
+      completed: tasks.filter(t => t.status === 'completed' || t.completed_at).length
+    };
+  });
+
+  sortedTasks = computed(() => {
+    const tasks = this.list.tasks || [];
+    return [...tasks].sort((a, b) => {
+      const aCompleted = a.status === 'completed' || !!a.completed_at;
+      const bCompleted = b.status === 'completed' || !!b.completed_at;
+
+      if (aCompleted && !bCompleted) return 1;
+      if (!aCompleted && bCompleted) return -1;
+
+      const priorityOrder = { urgent: 4, high: 3, medium: 2, low: 1 };
+      const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority];
+      if (priorityDiff !== 0) return priorityDiff;
+
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+  });
+
+  async createTask(): Promise<void> {
+    const title = this.newTaskTitle().trim();
+    if (!title) return;
+
+    const description = this.newTaskDescription().trim() || undefined;
+
+    await this.taskService.createTask(
+      title,
+      this.list.id,
+      this.selectedTaskPriority(),
+      description
+    );
+
+    this.newTaskTitle.set('');
+    this.newTaskDescription.set('');
+    this.selectedTaskPriority.set(TaskPriority.MEDIUM);
+    this.showDescriptionInput.set(false);
   }
 
-  deleteList(): void {
-    if (confirm(`¿Estás seguro de que deseas eliminar la lista "${this.list.name}"?`)) {
-      this.taskService.deleteList(this.list.id);
-    }
+  async deleteList(): Promise<void> {
+    await this.taskService.deleteList(this.list.id);
   }
 
   toggleOptions(): void {
     this.showOptions.set(!this.showOptions());
   }
 
-  getListBorderClass(): string {
-    if (this.list.color) {
-      return `border-t-${this.list.color}`;
-    }
-    return 'border-t-primary';
+  toggleDescriptionInput(): void {
+    this.showDescriptionInput.set(!this.showDescriptionInput());
   }
 
-  getPriorityCount(priority: TaskPriority): number {
-    return TaskUtils.countTasksByPriority(this.list.tasks, priority);
-  }
-
-  formatDate(date: Date): string {
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
     return new Intl.DateTimeFormat('es-ES', {
       day: 'numeric',
       month: 'short'
     }).format(date);
   }
 
-  // Drag and Drop handlers
   onDragOver(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
@@ -92,15 +121,19 @@ export class List {
     }
   }
 
-  onTaskMoved(event: { taskId: string, sourceListId: string, targetListId: string }): void {
+  onTaskMoved(event: { taskId: number, sourceListId: number, targetListId: number }): void {
     this.taskMoved.emit(event);
   }
 
-  onTaskDeleted(taskId: string): void {
-    this.taskService.deleteTask(taskId, this.list.id);
+  async onTaskDeleted(taskId: number): Promise<void> {
+    await this.taskService.deleteTask(taskId);
   }
 
-  onTaskCompleted(taskId: string): void {
-    this.taskService.completeTask(taskId, this.list.id);
+  async onTaskCompleted(taskId: number): Promise<void> {
+    await this.taskService.completeTask(taskId);
+  }
+
+  onTaskDetailOpened(task: ApiTask): void {
+    this.taskDetailOpened.emit(task);
   }
 }

@@ -1,200 +1,404 @@
-import { StorageService } from '@/app/core/services/storage-service';
-import { TaskList } from '@/app/shared/models/list.model';
-import { Task, TaskPriority } from '@/app/shared/models/task.model';
-import { computed, Injectable, signal } from '@angular/core';
+import { ConfirmationService } from '@/app/core/services/confirmation-service';
+import { ToastService } from '@/app/core/services/toast-service';
+import { ApiTask, ApiTaskList, TaskComment, TaskPriority, TaskStatus } from '@/app/shared/models/task.model';
+import { computed, inject, Injectable, signal } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+import { CommentService } from './comment-service';
+import { ListService } from './list-service';
+import { TaskApiService } from './task-api-service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TaskService {
 
-  private readonly LISTS_KEY = 'task_lists';
+  private listApiService = inject(ListService);
+  private taskApiService = inject(TaskApiService);
+  private commentService = inject(CommentService);
+  private toastService = inject(ToastService);
+  private confirmationService = inject(ConfirmationService);
 
-  // Signal para almacenar las listas (inicializar vacío)
-  private listsSignal = signal<TaskList[]>([]);
+  private listsSignal = signal<ApiTaskList[]>([]);
+  private loadingSignal = signal<boolean>(false);
+  private errorSignal = signal<string | null>(null);
 
-  // Computed signal para acceso público
   public lists = computed(() => this.listsSignal());
+  public loading = computed(() => this.loadingSignal());
+  public error = computed(() => this.errorSignal());
 
-  constructor(private storageService: StorageService) {
-    // Cargar las listas después de que se complete la inyección
-    this.initializeLists();
+  constructor() {
+    this.loadLists();
   }
 
-  private initializeLists(): void {
-    const loadedLists = this.loadLists();
-    this.listsSignal.set(loadedLists);
-  }
 
-  private loadLists(): TaskList[] {
-    const stored = this.storageService.getItem(this.LISTS_KEY);
-    if (!stored || !Array.isArray(stored)) {
-      // Crear listas por defecto si no existen
-      const defaultLists: TaskList[] = [
-        {
-          id: this.generateId(),
-          name: 'Por Hacer',
-          createdAt: new Date(),
-          tasks: []
-        },
-        {
-          id: this.generateId(),
-          name: 'En Progreso',
-          createdAt: new Date(),
-          tasks: []
-        },
-        {
-          id: this.generateId(),
-          name: 'Completado',
-          createdAt: new Date(),
-          tasks: []
-        }
-      ];
-      this.saveLists(defaultLists);
-      return defaultLists;
-    }
+  async loadLists(): Promise<void> {
+    try {
+      this.loadingSignal.set(true);
+      this.errorSignal.set(null);
 
-    // Convertir fechas de string a Date
-    return stored.map((list: any) => ({
-      ...list,
-      createdAt: new Date(list.createdAt),
-      tasks: list.tasks.map((task: any) => ({
-        ...task,
-        createdAt: new Date(task.createdAt),
-        finishedAt: task.finishedAt ? new Date(task.finishedAt) : undefined
-      }))
-    }));
-  }
+      const response = await firstValueFrom(
+        this.listApiService.getLists({ include_tasks: true })
+      );
 
-  private saveLists(lists: TaskList[]): void {
-    this.storageService.setItem(this.LISTS_KEY, lists);
-  }
-
-  private generateId(): string {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
-  }
-
-  // Crear nueva lista
-  createList(name: string, color?: string): void {
-    const newList: TaskList = {
-      id: this.generateId(),
-      name,
-      createdAt: new Date(),
-      tasks: [],
-      color
-    };
-
-    const currentLists = this.listsSignal();
-    const updatedLists = [...currentLists, newList];
-    this.listsSignal.set(updatedLists);
-    this.saveLists(updatedLists);
-  }
-
-  // Crear nueva tarea
-  createTask(description: string, listId: string, priority: TaskPriority = TaskPriority.MEDIUM): void {
-    const newTask: Task = {
-      id: this.generateId(),
-      description,
-      createdAt: new Date(),
-      listId,
-      priority
-    };
-
-    const currentLists = this.listsSignal();
-    const updatedLists = currentLists.map(list => {
-      if (list.id === listId) {
-        return {
-          ...list,
-          tasks: [...list.tasks, newTask]
-        };
+      if (response.success) {
+        this.listsSignal.set(response.data.lists);
       }
-      return list;
-    });
-
-    this.listsSignal.set(updatedLists);
-    this.saveLists(updatedLists);
-  }
-
-  // Mover tarea entre listas
-  moveTask(taskId: string, sourceListId: string, targetListId: string): void {
-    const currentLists = this.listsSignal();
-    let taskToMove: Task | null = null;
-
-    // Encontrar y remover la tarea de la lista origen
-    const updatedLists = currentLists.map(list => {
-      if (list.id === sourceListId) {
-        const taskIndex = list.tasks.findIndex(task => task.id === taskId);
-        if (taskIndex !== -1) {
-          taskToMove = { ...list.tasks[taskIndex], listId: targetListId };
-          return {
-            ...list,
-            tasks: list.tasks.filter(task => task.id !== taskId)
-          };
-        }
-      }
-      return list;
-    });
-
-    // Agregar la tarea a la lista destino
-    if (taskToMove) {
-      const finalLists = updatedLists.map(list => {
-        if (list.id === targetListId) {
-          return {
-            ...list,
-            tasks: [...list.tasks, taskToMove!]
-          };
-        }
-        return list;
-      });
-
-      this.listsSignal.set(finalLists);
-      this.saveLists(finalLists);
+    } catch (error: any) {
+      this.errorSignal.set(error.message);
+      this.toastService.error('Error al cargar las listas');
+      console.error('Error loading lists:', error);
+    } finally {
+      this.loadingSignal.set(false);
     }
   }
 
-  // Completar tarea
-  completeTask(taskId: string, listId: string): void {
-    const currentLists = this.listsSignal();
-    const updatedLists = currentLists.map(list => {
-      if (list.id === listId) {
-        return {
-          ...list,
-          tasks: list.tasks.map(task =>
-            task.id === taskId
-              ? { ...task, finishedAt: new Date() }
-              : task
-          )
-        };
-      }
-      return list;
-    });
 
-    this.listsSignal.set(updatedLists);
-    this.saveLists(updatedLists);
+  async createList(name: string, color?: string, description?: string): Promise<void> {
+    try {
+      this.loadingSignal.set(true);
+
+      const response = await firstValueFrom(
+        this.listApiService.createList({
+          name,
+          color,
+          description,
+          position: this.lists().length
+        })
+      );
+
+      if (response.success) {
+        await this.loadLists();
+        this.toastService.success('Lista creada exitosamente');
+      }
+    } catch (error: any) {
+      this.toastService.error(error.message || 'Error al crear la lista');
+      console.error('Error creating list:', error);
+      throw error;
+    } finally {
+      this.loadingSignal.set(false);
+    }
   }
 
-  // Eliminar tarea
-  deleteTask(taskId: string, listId: string): void {
-    const currentLists = this.listsSignal();
-    const updatedLists = currentLists.map(list => {
-      if (list.id === listId) {
-        return {
-          ...list,
-          tasks: list.tasks.filter(task => task.id !== taskId)
-        };
-      }
-      return list;
-    });
 
-    this.listsSignal.set(updatedLists);
-    this.saveLists(updatedLists);
+  async updateList(
+    listId: number,
+    name?: string,
+    color?: string,
+    description?: string
+  ): Promise<void> {
+    try {
+      this.loadingSignal.set(true);
+
+      const response = await firstValueFrom(
+        this.listApiService.updateList(listId, { name, color, description })
+      );
+
+      if (response.success) {
+        await this.loadLists();
+        this.toastService.success('Lista actualizada exitosamente');
+      }
+    } catch (error: any) {
+      this.toastService.error(error.message || 'Error al actualizar la lista');
+      console.error('Error updating list:', error);
+      throw error;
+    } finally {
+      this.loadingSignal.set(false);
+    }
   }
 
-  // Eliminar lista
-  deleteList(listId: string): void {
-    const currentLists = this.listsSignal();
-    const updatedLists = currentLists.filter(list => list.id !== listId);
-    this.listsSignal.set(updatedLists);
-    this.saveLists(updatedLists);
+
+  async deleteList(listId: number): Promise<void> {
+    const list = this.lists().find(l => l.id === listId);
+    if (!list) return;
+
+    const confirmed = await firstValueFrom(
+      this.confirmationService.confirmDelete(
+        list.name,
+        '¿Estás seguro de que deseas eliminar esta lista? Esta acción no se puede deshacer.'
+      )
+    );
+
+    if (!confirmed) return;
+
+    try {
+      this.loadingSignal.set(true);
+
+      const response = await firstValueFrom(
+        this.listApiService.deleteList(listId)
+      );
+
+      if (response.success) {
+        await this.loadLists();
+        this.toastService.success('Lista eliminada exitosamente');
+      }
+    } catch (error: any) {
+      this.toastService.error(error.message || 'Error al eliminar la lista');
+      console.error('Error deleting list:', error);
+    } finally {
+      this.loadingSignal.set(false);
+    }
+  }
+
+
+  async createTask(
+    title: string,
+    listId: number,
+    priority: TaskPriority = TaskPriority.MEDIUM,
+    description?: string
+  ): Promise<void> {
+    try {
+      this.loadingSignal.set(true);
+
+      const response = await firstValueFrom(
+        this.taskApiService.createTask({
+          title,
+          description,
+          priority,
+          list_id: listId
+        })
+      );
+
+      if (response.success) {
+        await this.loadLists();
+        this.toastService.success('Tarea creada exitosamente');
+      }
+    } catch (error: any) {
+      this.toastService.error(error.message || 'Error al crear la tarea');
+      console.error('Error creating task:', error);
+      throw error;
+    } finally {
+      this.loadingSignal.set(false);
+    }
+  }
+
+
+  async updateTask(
+    taskId: number,
+    updates: {
+      title?: string;
+      description?: string;
+      priority?: TaskPriority;
+      status?: TaskStatus;
+    }
+  ): Promise<void> {
+    try {
+      this.loadingSignal.set(true);
+
+      const response = await firstValueFrom(
+        this.taskApiService.updateTask(taskId, updates)
+      );
+
+      if (response.success) {
+        await this.loadLists();
+        this.toastService.success('Tarea actualizada exitosamente');
+      }
+    } catch (error: any) {
+      this.toastService.error(error.message || 'Error al actualizar la tarea');
+      console.error('Error updating task:', error);
+      throw error;
+    } finally {
+      this.loadingSignal.set(false);
+    }
+  }
+
+
+  async completeTask(taskId: number): Promise<void> {
+    try {
+      this.loadingSignal.set(true);
+
+      const response = await firstValueFrom(
+        this.taskApiService.completeTask(taskId)
+      );
+
+      if (response.success) {
+        await this.loadLists();
+        this.toastService.success('Tarea completada');
+      }
+    } catch (error: any) {
+      this.toastService.error(error.message || 'Error al completar la tarea');
+      console.error('Error completing task:', error);
+    } finally {
+      this.loadingSignal.set(false);
+    }
+  }
+
+
+  async deleteTask(taskId: number): Promise<void> {
+    const confirmed = await firstValueFrom(
+      this.confirmationService.confirmDelete(
+        'esta tarea',
+        '¿Estás seguro de que deseas eliminar esta tarea?'
+      )
+    );
+
+    if (!confirmed) return;
+
+    try {
+      this.loadingSignal.set(true);
+
+      const response = await firstValueFrom(
+        this.taskApiService.deleteTask(taskId)
+      );
+
+      if (response.success) {
+        await this.loadLists();
+        this.toastService.success('Tarea eliminada exitosamente');
+      }
+    } catch (error: any) {
+      this.toastService.error(error.message || 'Error al eliminar la tarea');
+      console.error('Error deleting task:', error);
+    } finally {
+      this.loadingSignal.set(false);
+    }
+  }
+
+
+  async moveTask(taskId: number, sourceListId: number, targetListId: number): Promise<void> {
+    try {
+      this.loadingSignal.set(true);
+
+      const response = await firstValueFrom(
+        this.taskApiService.moveTask(taskId, {
+          source_list_id: sourceListId,
+          target_list_id: targetListId,
+          position: 0
+        })
+      );
+
+      if (response.success) {
+        await this.loadLists();
+        this.toastService.success('Tarea movida exitosamente');
+      }
+    } catch (error: any) {
+      this.toastService.error(error.message || 'Error al mover la tarea');
+      console.error('Error moving task:', error);
+    } finally {
+      this.loadingSignal.set(false);
+    }
+  }
+
+
+  async reorderLists(lists: Array<{ id: number; position: number }>): Promise<void> {
+    try {
+      this.loadingSignal.set(true);
+
+      const response = await firstValueFrom(
+        this.listApiService.reorderLists({ lists })
+      );
+
+      if (response.success) {
+        await this.loadLists();
+      }
+    } catch (error: any) {
+      this.toastService.error(error.message || 'Error al reordenar las listas');
+      console.error('Error reordering lists:', error);
+    } finally {
+      this.loadingSignal.set(false);
+    }
+  }
+
+  getTaskById(taskId: number): ApiTask | undefined {
+    for (const list of this.lists()) {
+      const task = list.tasks?.find(t => t.id === taskId);
+      if (task) return task;
+    }
+    return undefined;
+  }
+
+  getListById(listId: number): ApiTaskList | undefined {
+    return this.lists().find(l => l.id === listId);
+  }
+
+  async getComments(taskId: number): Promise<TaskComment[]> {
+    try {
+      this.loadingSignal.set(true);
+      this.errorSignal.set(null);
+
+      const response = await firstValueFrom(
+        this.commentService.getComments(taskId)
+      );
+
+      if (response.success) {
+        console.log('API response data:', response.data);
+        const data = response.data as any;
+        return Array.isArray(data) ? data : (data.comments || []);
+      }
+      return [];
+    } catch (error: any) {
+      this.errorSignal.set(error.message);
+      this.toastService.error('Error al cargar comentarios');
+      console.error('Error loading comments:', error);
+      return [];
+    } finally {
+      this.loadingSignal.set(false);
+    }
+  }
+
+  async createComment(taskId: number, content: string): Promise<void> {
+    try {
+      this.loadingSignal.set(true);
+
+      const response = await firstValueFrom(
+        this.commentService.createComment(taskId, { content })
+      );
+
+      if (response.success) {
+        this.toastService.success('Comentario agregado exitosamente');
+      }
+    } catch (error: any) {
+      this.toastService.error(error.message || 'Error al agregar comentario');
+      console.error('Error creating comment:', error);
+      throw error;
+    } finally {
+      this.loadingSignal.set(false);
+    }
+  }
+
+  async updateComment(taskId: number, commentId: number, content: string): Promise<void> {
+    try {
+      this.loadingSignal.set(true);
+
+      const response = await firstValueFrom(
+        this.commentService.updateComment(taskId, commentId, { content })
+      );
+
+      if (response.success) {
+        this.toastService.success('Comentario actualizado exitosamente');
+      }
+    } catch (error: any) {
+      this.toastService.error(error.message || 'Error al actualizar comentario');
+      console.error('Error updating comment:', error);
+      throw error;
+    } finally {
+      this.loadingSignal.set(false);
+    }
+  }
+
+  async deleteComment(taskId: number, commentId: number): Promise<void> {
+    const confirmed = await firstValueFrom(
+      this.confirmationService.confirmDelete(
+        'este comentario',
+        '¿Estás seguro de que deseas eliminar este comentario?'
+      )
+    );
+
+    if (!confirmed) return;
+
+    try {
+      this.loadingSignal.set(true);
+
+      const response = await firstValueFrom(
+        this.commentService.deleteComment(taskId, commentId)
+      );
+
+      if (response.success) {
+        this.toastService.success('Comentario eliminado exitosamente');
+      }
+    } catch (error: any) {
+      this.toastService.error(error.message || 'Error al eliminar comentario');
+      console.error('Error deleting comment:', error);
+    } finally {
+      this.loadingSignal.set(false);
+    }
   }
 }

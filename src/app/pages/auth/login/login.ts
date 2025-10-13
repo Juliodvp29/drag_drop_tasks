@@ -44,7 +44,6 @@ export class Login {
       next: (response) => {
         this.isLoading.set(false);
 
-        // Obtener returnUrl de los query params o redirigir al home
         const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
         this.router.navigate([returnUrl]);
       },
